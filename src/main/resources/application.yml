@@ -1,0 +1,58 @@
+server:
+  port: 8088
+  address: 0.0.0.0
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+  show-actuator: true
+
+spring:
+
+  application:
+    name: boot-rest-app
+
+  boot:
+    admin:
+      client:
+        url: http://localhost:8081/
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/sandbox-rest-app
+    username: sandbox-rest-app-user
+    password: sandbox-rest-app-user-pwd
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: none  # We want Liquibase, not Hibernate, to manage our schema
+#    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: true    # Helpful during development to see the SQL
+
+  liquibase:
+#    change-log: classpath:db/changelog/db.changelog-master.yaml
+    change-log: classpath:db/changelog/db.changelog-master.xml
+    enabled: true
+
+management:
+  endpoint:
+#    metrics:
+#      enabled: false
+    shutdown:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+#        include: "*"
+        include: health,info,prometheus
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+
+#        include: health,info,shutdown
+logging:
+
+#  level:
+#    org:
+#      springdoc: DEBUG

@@ -1,0 +1,13 @@
+databaseChangeLog:
+  - changeSet:
+      id: 002-add-description
+      author: your_name
+      changes:
+        - addColumn:
+            tableName: sample_table
+            columns:
+              - column:
+                  name: description
+                  type: text
+                  constraints:
+                    nullable: true
