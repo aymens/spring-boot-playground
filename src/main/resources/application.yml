@@ -8,7 +8,6 @@ springdoc:
   show-actuator: true
 
 spring:
-
   application:
     name: boot-rest-app
 

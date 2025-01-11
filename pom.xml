@@ -8,18 +8,20 @@
         <version>3.3.7</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
-    <groupId>com.example</groupId>
+
+    <groupId>io.playground</groupId>
     <artifactId>spring-boot-playground</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>Spring Boot Playground</name>
     <description>Demo project for Spring Boot</description>
+
     <properties>
         <java.version>22</java.version>
         <jakarta.persistence-api.version>3.1.0</jakarta.persistence-api.version>
         <org.mapstruct.version>1.5.5.Final</org.mapstruct.version>
     </properties>
-    <dependencies>
 
+    <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
@@ -67,7 +69,6 @@
             <artifactId>netty-common</artifactId>
             <version>4.1.115.Final</version>
         </dependency>
-
 
         <dependency>
             <groupId>org.springdoc</groupId>
