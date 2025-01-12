@@ -3,8 +3,8 @@ package io.playground.mapper;
 import io.playground.domain.Company;
 import io.playground.domain.Department;
 import io.playground.domain.Employee;
-import com.example.model.*;
 import io.playground.model.*;
+import lombok.val;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,9 +36,9 @@ class MapperTests {
 
         @Test
         void shouldMapValidCompany() {
-            CompanyIn in = new CompanyIn();
-            in.setName("Acme Corp");
-            in.setTaxId("1234567890");
+            CompanyIn in = CompanyIn.builder()
+                    .name("Acme Corp")
+                    .taxId("1234567890").build();
 
             Company company = companyMapper.map(in);
 
@@ -70,14 +70,14 @@ class MapperTests {
         @Test
         void shouldHandleNulls() {
             assertThat(departmentMapper.map(null, null)).isNull();
-            assertThat(departmentMapper.map(new DepartmentIn(), null)).isNull();
+            assertThat(departmentMapper.map(DepartmentIn.builder().build(), null)).isNull();
             assertThat(departmentMapper.map(null, new Company())).isNull();
         }
 
         @Test
         void shouldMapValidDepartment() {
-            DepartmentIn in = new DepartmentIn();
-            in.setName("IT");
+            val in = DepartmentIn.builder()
+                    .name("IT").build();
 
             Company company = new Company();
             company.setId(1L);
@@ -112,17 +112,18 @@ class MapperTests {
         @Test
         void shouldHandleNulls() {
             assertThat(employeeMapper.map(null, null)).isNull();
-            assertThat(employeeMapper.map(new EmployeeIn(), null)).isNull();
+            assertThat(employeeMapper.map(EmployeeIn.builder().build(), null)).isNull();
             assertThat(employeeMapper.map(null, new Department())).isNull();
         }
 
         @Test
         void shouldMapValidEmployee() {
-            EmployeeIn in = new EmployeeIn();
-            in.setFirstName("John");
-            in.setLastName("Doe");
-            in.setEmail("john@example.com");
-            in.setHireDate(Instant.now());
+            val in = EmployeeIn.builder()
+                    .firstName("John")
+                    .lastName("Doe")
+                    .email("john@example.com")
+                    .hireDate(Instant.now())
+                    .build();
 
             Department dept = new Department();
             dept.setId(1L);

@@ -188,7 +188,7 @@
                 <configuration>
                     <argLine>
                         -javaagent:"${settings.localRepository}/org/mockito/mockito-core/5.14.2/mockito-core-5.14.2.jar"
-                        -XX:+EnableDynamicAgentLoading
+                        -XX:+EnableDynamicAgentLoading -Xshare:off
                     </argLine>
                 </configuration>
             </plugin>

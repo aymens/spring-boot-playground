@@ -1,14 +1,13 @@
 package io.playground.model;
 
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
+import lombok.Builder;
 import lombok.Data;
 
 import java.time.Instant;
 
 @Data
+@Builder
 public class EmployeeIn {
     @NotBlank(message = "First name is required")
     @Size(max = 50)
@@ -26,5 +25,6 @@ public class EmployeeIn {
     private Long departmentId;
 
     @NotNull(message = "Hire date is required")
+    @PastOrPresent(message = "Hire date cannot be in the future")
     private Instant hireDate;
 }
