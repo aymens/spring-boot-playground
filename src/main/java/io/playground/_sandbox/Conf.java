@@ -1,4 +1,4 @@
-package io.playground._playground;
+package io.playground._sandbox;
 
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;

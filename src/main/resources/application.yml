@@ -17,7 +17,7 @@ spring:
         url: http://localhost:8081/
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/sandbox-rest-app
+    url: jdbc:postgresql://localhost:5432/sandbox-rest-app #TODO variabilize ${ENV_VAR: def-val}
     username: sandbox-rest-app-user
     password: sandbox-rest-app-user-pwd
     driver-class-name: org.postgresql.Driver

@@ -1,10 +1,11 @@
-package io.playground.web;
+package io.playground.web.u;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.playground.exception.BusinessException;
 import io.playground.model.DepartmentIn;
 import io.playground.model.DepartmentOut;
 import io.playground.service.DepartmentService;
+import io.playground.web.DepartmentController;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;

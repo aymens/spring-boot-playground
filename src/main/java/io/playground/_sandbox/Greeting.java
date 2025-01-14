@@ -1,3 +1,3 @@
-package io.playground._playground;
+package io.playground._sandbox;
 
 public record Greeting(long id, String content) { }

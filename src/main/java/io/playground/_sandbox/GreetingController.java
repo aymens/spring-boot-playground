@@ -1,4 +1,4 @@
-package io.playground._playground;
+package io.playground._sandbox;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.MediaType;

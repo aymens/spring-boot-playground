@@ -1,10 +1,7 @@
 package io.playground.domain;
 
 import jakarta.persistence.*;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -16,6 +13,9 @@ import java.util.List;
 @Setter
 @ToString
 @EqualsAndHashCode
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 //TODO Map relationship
 public class Company {
     @Id

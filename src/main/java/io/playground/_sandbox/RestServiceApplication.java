@@ -1,4 +1,4 @@
-package io.playground._playground;
+package io.playground._sandbox;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

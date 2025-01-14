@@ -5,11 +5,21 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
                         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
 
-    <changeSet id="001-drop-existing-tables" author="aimen.saihi">
+    <changeSet id="004-01-drop-existing-tables" author="aimen.saihi">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="sample_table" />
+        </preConditions>
         <dropTable tableName="sample_table" cascadeConstraints="true"/>
     </changeSet>
 
-    <changeSet id="002-create-company" author="aimen.saihi">
+    <changeSet id="004-02-drop-existing-tables" author="aimen.saihi">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="company" />
+        </preConditions>
+        <dropTable tableName="company" cascadeConstraints="true"/>
+    </changeSet>
+
+    <changeSet id="005-create-company" author="aimen.saihi">
         <createTable tableName="company">
             <column name="id" type="bigint" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
@@ -26,7 +36,14 @@
         </createTable>
     </changeSet>
 
-    <changeSet id="003-create-department" author="aimen.saihi">
+    <changeSet id="004-03-drop-existing-tables" author="aimen.saihi">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="department" />
+        </preConditions>
+        <dropTable tableName="department" cascadeConstraints="true"/>
+    </changeSet>
+
+    <changeSet id="006-create-department" author="aimen.saihi">
         <createTable tableName="department">
             <column name="id" type="bigint" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
@@ -42,7 +59,14 @@
         </createTable>
     </changeSet>
 
-    <changeSet id="004-create-employee" author="aimen.saihi">
+    <changeSet id="004-04-drop-existing-tables" author="aimen.saihi">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="employee" />
+        </preConditions>
+        <dropTable tableName="employee" cascadeConstraints="true"/>
+    </changeSet>
+
+    <changeSet id="007-create-employee" author="aimen.saihi">
         <createTable tableName="employee">
             <column name="id" type="bigint" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
@@ -67,7 +91,28 @@
         </createTable>
     </changeSet>
 
-    <changeSet id="005-create-indexes" author="aimen.saihi">
+    <changeSet id="004-05-drop-existing-indexes" author="aimen.saihi">
+        <preConditions onFail="MARK_RAN">
+            <indexExists indexName="idx_employee_email"/>
+        </preConditions>
+        <dropIndex indexName="idx_employee_email" tableName="employee"/>
+    </changeSet>
+
+    <changeSet id="004-06-drop-existing-indexes" author="aimen.saihi">
+        <preConditions onFail="MARK_RAN">
+            <indexExists indexName="idx_department_company"/>
+        </preConditions>
+        <dropIndex indexName="idx_department_company" tableName="department"/>
+    </changeSet>
+
+    <changeSet id="004-07-drop-existing-indexes" author="aimen.saihi">
+        <preConditions onFail="MARK_RAN">
+            <indexExists indexName="idx_employee_email"/>
+        </preConditions>
+        <dropIndex indexName="idx_employee_email" tableName="employee"/>
+    </changeSet>
+
+    <changeSet id="008-create-indexes" author="aimen.saihi">
         <createIndex indexName="idx_employee_email" tableName="employee">
             <column name="email"/>
         </createIndex>

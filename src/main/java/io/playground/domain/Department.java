@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "company")
+@Table(name = "department")
 @Getter
 @Setter
 @ToString
@@ -30,7 +30,7 @@ public class Department {
     private Company company;
 
     @OneToMany(mappedBy = "department", cascade = CascadeType.ALL)
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
+    @ToString.Exclude // Prevent recursive toString()
+    @EqualsAndHashCode.Exclude // Prevent recursive toString()
     private List<Employee> employees = new ArrayList<>();
 }

@@ -13,23 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.playground._playground;
+package io.playground._sandbox;
 
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static org.mockito.Mockito.doAnswer;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest
-public class GreetingControllerTests {
+@SpringBootTest
+@AutoConfigureMockMvc
+public class GreetingController2Tests {
 
     @Autowired
     private MockMvc mockMvc;
@@ -37,24 +39,17 @@ public class GreetingControllerTests {
     @MockBean
     SomeService someService;
 
-    //		@TestConfiguration
-    @Configuration
-    @Import(GreetingController.class)
-    static class Conf {
+    @BeforeEach
+    void init() {
+        doAnswer(invocation -> {
+            System.out.println("rrrrrrr");
+            return null;
+        })
+                .when(someService).someMethod();
     }
 
     @Test
-//    @ConvertWith()
     public void noParamGreetingShouldReturnDefaultMessage() throws Exception {
-//@EnableAspectJAutoProxy
-//        Objects.requireNonNullElse()
-
-//        TestClassOrder
-//        Arguments.of()
-//        Order
-//        Assertions.assertTimeout();
-//        Assertions.assertAll();
-//        MethodOrderer.MethodName
         this.mockMvc.perform(get("/api/v1/greeting"))
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -63,7 +58,6 @@ public class GreetingControllerTests {
 
     @Test
     public void paramGreetingShouldReturnTailoredMessage() throws Exception {
-
         this.mockMvc.perform(get("/api/v1/greeting").param("name", "Spring Community"))
                 .andDo(print())
                 .andExpect(status().isOk())

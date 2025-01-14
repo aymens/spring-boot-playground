@@ -6,10 +6,13 @@
                         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
 
     <changeSet id="001-drop-if-exists" author="your_name">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="sample_table"/>
+        </preConditions>
         <dropTable tableName="sample_table" cascadeConstraints="true"/>
     </changeSet>
 
-    <changeSet id="001-create-first-table" author="your_name">
+    <changeSet id="002-create-first-table" author="your_name">
         <createTable tableName="sample_table" >
             <column name="id" type="bigint" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>

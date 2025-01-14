@@ -1,10 +1,11 @@
-package io.playground.web;
+package io.playground.web.u;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.playground.exception.BusinessException;
 import io.playground.model.CompanyIn;
 import io.playground.model.CompanyOut;
 import io.playground.service.CompanyService;
+import io.playground.web.CompanyController;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -135,7 +136,6 @@ class CompanyControllerTest {
                 .name("Acme")
                 .taxId("1234567890")
                 .build();
-
 
         when(companyService.getById(1L)).thenReturn(output);
 
