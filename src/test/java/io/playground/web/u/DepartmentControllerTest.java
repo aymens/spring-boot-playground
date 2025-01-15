@@ -164,18 +164,18 @@ class DepartmentControllerTest {
 
     @Test
     void shouldDeleteDepartment() throws Exception {
-        doNothing().when(departmentService).delete(1L);
+        doNothing().when(departmentService).delete(eq(1L), isNull());
 
         mockMvc.perform(delete("/api/departments/1"))
                 .andExpect(status().isNoContent());
 
-        verify(departmentService).delete(1L);
+        verify(departmentService).delete(1L, null);
     }
 
     @Test
     void shouldHandleDeleteNonExistentDepartment() throws Exception {
         doThrow(new BusinessException("Department not found: 999"))
-                .when(departmentService).delete(999L);
+                .when(departmentService).delete(eq(999L), isNull());
 
         mockMvc.perform(delete("/api/departments/999"))
                 .andExpect(status().isBadRequest())

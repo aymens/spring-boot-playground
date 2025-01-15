@@ -8,11 +8,15 @@ import io.playground.model.DepartmentIn;
 import io.playground.model.DepartmentOut;
 import io.playground.repository.CompanyRepository;
 import io.playground.repository.DepartmentRepository;
+import io.playground.repository.EmployeeRepository;
 import io.playground.service.DepartmentService;
+import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -22,13 +26,16 @@ public class DepartmentServiceImpl implements DepartmentService {
     private final DepartmentRepository departmentRepository;
     private final CompanyRepository companyRepository;
     private final DepartmentMapper departmentMapper;
+    private final EmployeeRepository employeeRepository;
 
     public DepartmentServiceImpl(DepartmentRepository departmentRepository,
                                  CompanyRepository companyRepository,
-                                 DepartmentMapper departmentMapper) {
+                                 DepartmentMapper departmentMapper,
+                                 EmployeeRepository employeeRepository) {
         this.departmentRepository = departmentRepository;
         this.companyRepository = companyRepository;
         this.departmentMapper = departmentMapper;
+        this.employeeRepository = employeeRepository;
     }
 
     @Override
@@ -66,10 +73,37 @@ public class DepartmentServiceImpl implements DepartmentService {
     }
 
     @Override
-    public void delete(Long id) {
-        if (!departmentRepository.existsById(id)) {
-            throw new BusinessException("Department not found: " + id);
+    public void delete(Long id, @Nullable Long transferToDepartmentId) {
+        Department department = departmentRepository.findById(id)
+                .orElseThrow(() -> new BusinessException("Department not found: " + id));
+
+        if (!department.getEmployees().isEmpty()) {
+            if (transferToDepartmentId == null) {
+                throw new BusinessException(
+                        "Department has employees. Must specify a transfer department ID.");
+            }
+
+            Department targetDepartment = departmentRepository.findById(transferToDepartmentId)
+                    .orElseThrow(() -> new BusinessException("Target department not found: " + transferToDepartmentId));
+
+            // Validate target department is in same company
+            if (!targetDepartment.getCompany().getId().equals(department.getCompany().getId())) {
+                throw new BusinessException("Target department must be in the same company");
+            }
+
+            // Don't allow transfer to self
+            if (targetDepartment.getId().equals(department.getId())) {
+                throw new BusinessException("Cannot transfer employees to the same department");
+            }
+
+            department.getEmployees().forEach(employee -> employee.setDepartment(targetDepartment));
+            employeeRepository.saveAll(department.getEmployees());
+
+            // Clear employees from the department to prevent cascade delete
+            department.getEmployees().clear();
+            departmentRepository.save(department);
         }
+
         departmentRepository.deleteById(id);
     }
 
