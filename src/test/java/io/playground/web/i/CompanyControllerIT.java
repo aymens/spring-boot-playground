@@ -3,9 +3,13 @@ package io.playground.web.i;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.playground.common.AbstractPostgreSQLIntegrationTest;
 import io.playground.domain.Company;
+import io.playground.domain.Department;
+import io.playground.domain.Employee;
 import io.playground.model.CompanyIn;
 import io.playground.model.CompanyOut;
 import io.playground.repository.CompanyRepository;
+import io.playground.repository.DepartmentRepository;
+import io.playground.repository.EmployeeRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,9 +20,11 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.time.Instant;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -34,11 +40,10 @@ class CompanyControllerIT extends AbstractPostgreSQLIntegrationTest {
     private ObjectMapper objectMapper;
     @Autowired
     private CompanyRepository companyRepository;
-
-    @Test
-    void contextLoads() {
-        assertThat(POSTGRES.isRunning()).isTrue();
-    }
+    @Autowired
+    private DepartmentRepository departmentRepository;
+    @Autowired
+    private EmployeeRepository employeeRepository;
 
     @BeforeEach
     void setUp() {
@@ -179,4 +184,138 @@ class CompanyControllerIT extends AbstractPostgreSQLIntegrationTest {
                 .andExpect(jsonPath("$.taxId").value("Tax ID must be exactly 10 digits"));
     }
 
+    @Test
+    void shouldDeleteCompanyWithMultipleEmptyDepartments() throws Exception {
+        // Given
+        Company company = companyRepository.save(Company.builder()
+                .name("Multi-Dept Company")
+                .taxId("1234567890")
+                .build());
+
+        departmentRepository.saveAll(List.of(
+                Department.builder()
+                        .name("IT")
+                        .company(company)
+                        .build(),
+                Department.builder()
+                        .name("HR")
+                        .company(company)
+                        .build(),
+                Department.builder()
+                        .name("Finance")
+                        .company(company)
+                        .build()
+        ));
+
+        String uri = UriComponentsBuilder
+                .fromPath("/api/companies/{id}")
+                .buildAndExpand(company.getId())
+                .toUriString();
+
+        // When
+        mockMvc.perform(delete(uri))
+                .andExpect(status().isNoContent());
+
+        // Then
+        assertThat(companyRepository.existsById(company.getId())).isFalse();
+        assertThat(departmentRepository.findByCompanyId(company.getId())).isEmpty();
+    }
+
+    @Test
+    void shouldRejectDeleteCompanyWithMultipleDepartmentsAndEmployees() throws Exception {
+        // Given
+        Company company = companyRepository.save(Company.builder()
+                .name("Multi-Dept Company")
+                .taxId("1234567890")
+                .build());
+
+        // Create multiple departments
+        Department itDept = departmentRepository.save(Department.builder()
+                .name("IT")
+                .company(company)
+                .build());
+
+        Department hrDept = departmentRepository.save(Department.builder()
+                .name("HR")
+                .company(company)
+                .build());
+
+        // Add employees to different departments
+        employeeRepository.saveAll(List.of(
+                Employee.builder()
+                        .firstName("John")
+                        .lastName("Doe")
+                        .email("john@example.com")
+                        .department(itDept)
+                        .hireDate(Instant.now())
+                        .build(),
+                Employee.builder()
+                        .firstName("Jane")
+                        .lastName("Smith")
+                        .email("jane@example.com")
+                        .department(hrDept)
+                        .hireDate(Instant.now())
+                        .build()
+        ));
+
+        String uri = UriComponentsBuilder
+                .fromPath("/api/companies/{id}")
+                .buildAndExpand(company.getId())
+                .toUriString();
+
+        // When/Then
+        mockMvc.perform(delete(uri))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string(containsString(
+                        "Cannot delete company with existing employees")));
+
+        // Verify nothing was deleted
+        assertThat(companyRepository.existsById(company.getId())).isTrue();
+        assertThat(departmentRepository.findByCompanyId(company.getId())).hasSize(2);
+        assertThat(employeeRepository.findByDepartmentId(itDept.getId())).hasSize(1);
+        assertThat(employeeRepository.findByDepartmentId(hrDept.getId())).hasSize(1);
+    }
+
+    @Test
+    void shouldDeleteCompanyWithMixOfEmptyAndNonEmptyDepartments() throws Exception {
+        // Given
+        Company company = companyRepository.save(Company.builder()
+                .name("Mixed Dept Company")
+                .taxId("1234567890")
+                .build());
+
+        Department emptyDept = departmentRepository.save(Department.builder()
+                .name("Empty Dept")
+                .company(company)
+                .build());
+
+        Department deptWithEmployees = departmentRepository.save(Department.builder()
+                .name("Staffed Dept")
+                .company(company)
+                .build());
+
+        employeeRepository.save(Employee.builder()
+                .firstName("John")
+                .lastName("Doe")
+                .email("john@example.com")
+                .department(deptWithEmployees)
+                .hireDate(Instant.now())
+                .build());
+
+        String uri = UriComponentsBuilder
+                .fromPath("/api/companies/{id}")
+                .buildAndExpand(company.getId())
+                .toUriString();
+
+        // When/Then
+        mockMvc.perform(delete(uri))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string(containsString(
+                        "Cannot delete company with existing employees")));
+
+        // Verify nothing was deleted
+        assertThat(companyRepository.existsById(company.getId())).isTrue();
+        assertThat(departmentRepository.existsById(emptyDept.getId())).isTrue();
+        assertThat(departmentRepository.existsById(deptWithEmployees.getId())).isTrue();
+    }
 }

@@ -40,8 +40,8 @@ public abstract class AbstractPostgreSQLIntegrationTest {
         registry.add("spring.datasource.password", POSTGRES::getPassword);
     }
 
-    @Test //TODO DEL
-    void contextLoads() {
+    @Test
+    void testDbMustBeReady() {
         assertThat(POSTGRES.isRunning()).isTrue();
     }
 }

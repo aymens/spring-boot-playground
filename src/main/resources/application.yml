@@ -23,10 +23,17 @@ spring:
     driver-class-name: org.postgresql.Driver
 
   jpa:
-    hibernate:
-      ddl-auto: none  # We want Liquibase, not Hibernate, to manage our schema
-#    database-platform: org.hibernate.dialect.PostgreSQLDialect
     show-sql: true    # Helpful during development to see the SQL
+    generate-ddl: false # We want Liquibase, not Hibernate, to manage our schema
+#    properties:
+#      hibernate:
+#        format_sql: true
+        # Show values in queries instead of ?
+#        type: trace
+#    hibernate:
+#      ddl-auto: none  # We want Liquibase, not Hibernate, to manage our schema
+#    database-platform: org.hibernate.dialect.PostgreSQLDialect
+
 
   liquibase:
 #    change-log: classpath:db/changelog/db.changelog-master.yaml
@@ -51,7 +58,8 @@ management:
 
 #        include: health,info,shutdown
 logging:
-
-#  level:
+  level:
+#    org.hibernate.SQL: DEBUG
+    org.hibernate.orm.jdbc.bind: TRACE
 #    org:
 #      springdoc: DEBUG

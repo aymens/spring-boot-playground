@@ -7,12 +7,14 @@ import io.playground.model.CompanyIn;
 import io.playground.model.CompanyOut;
 import io.playground.repository.CompanyRepository;
 import io.playground.service.CompanyService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @Transactional
 public class CompanyServiceImpl implements CompanyService {
@@ -55,10 +57,26 @@ public class CompanyServiceImpl implements CompanyService {
 
     @Override
     public void delete(Long id) {
-        if (!companyRepository.existsById(id)) {
-            throw new BusinessException("Company not found: " + id);
+        log.debug("Attempting to delete company with id: {}", id);
+
+        Company company = companyRepository.findById(id)
+                .orElseThrow(() -> {
+                    log.error("Company not found for deletion: {}", id);
+                    return new BusinessException("Company not found: " + id);
+                });
+
+        boolean hasEmployees = company.getDepartments().stream()
+                .anyMatch(d -> !d.getEmployees().isEmpty());
+
+        if (hasEmployees) {
+            log.error("Cannot delete company {} as it has departments with employees", id);
+            throw new BusinessException(
+                    "Cannot delete company with existing employees. Transfer or remove employees first.");
         }
+
+        log.info("Deleting company: {} ({})", company.getName(), id);
         companyRepository.deleteById(id);
+        log.debug("Company deleted successfully: {}", id);
     }
 
     @Override
