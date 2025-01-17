@@ -1,7 +1,7 @@
 package io.playground.web.i;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.playground.common.AbstractPostgreSQLIntegrationTest;
+import io.playground.common.BaseIntegrationTest;
 import io.playground.domain.Company;
 import io.playground.domain.Department;
 import io.playground.domain.Employee;
@@ -14,7 +14,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -28,8 +27,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @Slf4j
-@AutoConfigureMockMvc
-class CompanyControllerIT extends AbstractPostgreSQLIntegrationTest {
+class CompanyControllerIT extends BaseIntegrationTest {
 
     private static final String BASE_URL = "/api/companies";
 

@@ -1,10 +1,11 @@
 package io.playground.web.i;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.playground.common.AbstractPostgreSQLIntegrationTest;
+import io.playground.common.BaseIntegrationTest;
 import io.playground.domain.Company;
 import io.playground.domain.Department;
 import io.playground.domain.Employee;
+import io.playground.junit.DatabaseExtension;
 import io.playground.model.DepartmentIn;
 import io.playground.model.DepartmentOut;
 import io.playground.repository.CompanyRepository;
@@ -13,8 +14,10 @@ import io.playground.repository.EmployeeRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -27,8 +30,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Slf4j
-@AutoConfigureMockMvc
-class DepartmentControllerIT extends AbstractPostgreSQLIntegrationTest {
+class DepartmentControllerIT extends BaseIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -342,10 +344,10 @@ class DepartmentControllerIT extends AbstractPostgreSQLIntegrationTest {
     void listDepartmentsByCompany_CompanyNotFound_ReturnsBadRequest() throws Exception {
         mockMvc.perform(get(BASE_URL + "/company/{companyId}", 99999L)
                 .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest())
+                .andExpect(status().isNotFound())
                 .andExpect(result ->
                     assertThat(result.getResponse().getContentAsString())
-                        .contains("Company not found"));
+                        .isEqualTo("io.playground.domain.Company(99999) not found"));
     }
 
     @Test

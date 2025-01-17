@@ -66,7 +66,7 @@ public class DepartmentServiceImpl implements DepartmentService {
     @Transactional(readOnly = true)
     public List<DepartmentOut> getByCompanyId(Long companyId) {
         if (!companyRepository.existsById(companyId)) {
-            throw new BusinessException("Company not found: " + companyId);
+            throw NotFoundException.of(Company.class.getName(), companyId);
         }
         return departmentRepository.findByCompanyId(companyId).stream()
                 .map(departmentMapper::map)
@@ -76,7 +76,7 @@ public class DepartmentServiceImpl implements DepartmentService {
     @Override
     public void delete(Long id, @Nullable Long transferToDepartmentId) {
         Department department = departmentRepository.findById(id)
-                .orElseThrow(() -> new BusinessException("Department not found: " + id));
+                .orElseThrow(() -> NotFoundException.of(Department.class.getName(), id));
 
         if (!department.getEmployees().isEmpty()) {
             if (transferToDepartmentId == null) {
