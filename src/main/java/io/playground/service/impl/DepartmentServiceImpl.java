@@ -3,6 +3,7 @@ package io.playground.service.impl;
 import io.playground.domain.Company;
 import io.playground.domain.Department;
 import io.playground.exception.BusinessException;
+import io.playground.exception.NotFoundException;
 import io.playground.mapper.DepartmentMapper;
 import io.playground.model.DepartmentIn;
 import io.playground.model.DepartmentOut;
@@ -58,7 +59,7 @@ public class DepartmentServiceImpl implements DepartmentService {
     public DepartmentOut getById(Long id) {
         return departmentRepository.findById(id)
                 .map(departmentMapper::map)
-                .orElseThrow(() -> new BusinessException("Department not found: " + id));
+                .orElseThrow(() -> NotFoundException.of(Department.class.getName(), id));
     }
 
     @Override
@@ -84,7 +85,7 @@ public class DepartmentServiceImpl implements DepartmentService {
             }
 
             Department targetDepartment = departmentRepository.findById(transferToDepartmentId)
-                    .orElseThrow(() -> new BusinessException("Target department not found: " + transferToDepartmentId));
+                    .orElseThrow(() -> NotFoundException.of(Department.class.getName(), transferToDepartmentId));
 
             // Validate target department is in same company
             if (!targetDepartment.getCompany().getId().equals(department.getCompany().getId())) {

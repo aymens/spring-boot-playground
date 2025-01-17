@@ -9,7 +9,7 @@ springdoc:
 
 spring:
   application:
-    name: boot-rest-app
+    name: spring-boot-playground
 
   boot:
     admin:
@@ -21,6 +21,13 @@ spring:
     username: sandbox-rest-app-user
     password: sandbox-rest-app-user-pwd
     driver-class-name: org.postgresql.Driver
+#    hikari:
+#      connection-test-query: SELECT 1
+#      connection-timeout:
+#      idle-timeout:
+#      keepalive-time:
+#      validation-timeout:
+#      max-lifetime:
 
   jpa:
     show-sql: true    # Helpful during development to see the SQL

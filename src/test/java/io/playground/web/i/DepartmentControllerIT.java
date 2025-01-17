@@ -260,13 +260,13 @@ class DepartmentControllerIT extends AbstractPostgreSQLIntegrationTest {
     }
 
     @Test
-    void getDepartment_NonExistentId_ReturnsBadRequest() throws Exception {
+    void getDepartment_NonExistentId_ReturnsNotFound() throws Exception {
         mockMvc.perform(get(BASE_URL + "/{id}", 99999L)
                 .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest())
+                .andExpect(status().isNotFound())
                 .andExpect(result -> 
                     assertThat(result.getResponse().getContentAsString())
-                        .contains("Department not found"));
+                        .contains("io.playground.domain.Department(99999) not found"));
     }
 
     @Test
@@ -571,6 +571,6 @@ class DepartmentControllerIT extends AbstractPostgreSQLIntegrationTest {
 
         // Verify it's deleted by trying to get it
         mockMvc.perform(get(BASE_URL + "/{id}", created.getId()))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isNotFound());
     }
 }

@@ -2,6 +2,7 @@ package io.playground.service.impl;
 
 import io.playground.domain.Company;
 import io.playground.exception.BusinessException;
+import io.playground.exception.NotFoundException;
 import io.playground.mapper.CompanyMapper;
 import io.playground.model.CompanyIn;
 import io.playground.model.CompanyOut;
@@ -44,7 +45,7 @@ public class CompanyServiceImpl implements CompanyService {
     public CompanyOut getById(Long id) {
         return companyRepository.findById(id)
                 .map(companyMapper::map)
-                .orElseThrow(() -> new BusinessException("Company not found: " + id));
+                .orElseThrow(() -> NotFoundException.of(Company.class.getName(), id));
     }
 
     @Override

@@ -3,6 +3,7 @@ package io.playground.service.impl;
 import io.playground.domain.Department;
 import io.playground.domain.Employee;
 import io.playground.exception.BusinessException;
+import io.playground.exception.NotFoundException;
 import io.playground.mapper.EmployeeMapper;
 import io.playground.model.EmployeeIn;
 import io.playground.model.EmployeeOut;
@@ -34,7 +35,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     public EmployeeOut create(EmployeeIn employeeIn) {
         Department department = departmentRepository.findById(employeeIn.getDepartmentId())
-                .orElseThrow(() -> new BusinessException("Department not found: " + employeeIn.getDepartmentId()));
+                .orElseThrow(() -> NotFoundException.of(Department.class.getName(), employeeIn.getDepartmentId()));
 
         if (employeeRepository.existsByEmail(employeeIn.getEmail())) {
             throw new BusinessException("Employee with email already exists: " + employeeIn.getEmail());
@@ -50,7 +51,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     public EmployeeOut getById(Long id) {
         return employeeRepository.findById(id)
                 .map(employeeMapper::map)
-                .orElseThrow(() -> new BusinessException("Employee not found: " + id));
+                .orElseThrow(() -> NotFoundException.of(Employee.class.getName(), id));
     }
 
     @Override
@@ -67,7 +68,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     public void delete(Long id) {
         if (!employeeRepository.existsById(id)) {
-            throw new BusinessException("Employee not found: " + id);
+            throw NotFoundException.of(Employee.class.getName(), id);
         }
         employeeRepository.deleteById(id);
     }

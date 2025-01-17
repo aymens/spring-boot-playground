@@ -28,8 +28,6 @@ public class CompanyController {
                 .body(companyService.create(company));
     }
 
-    @Validated
-
     @GetMapping("/{id}")
     public ResponseEntity<CompanyOut> getById(@PathVariable @Positive Long id) {
         return ResponseEntity.ok(companyService.getById(id));

@@ -226,6 +226,9 @@
                         -javaagent:"${settings.localRepository}/org/mockito/mockito-core/5.14.2/mockito-core-5.14.2.jar"
                         -XX:+EnableDynamicAgentLoading -Xshare:off
                     </argLine>
+                    <environmentVariables>
+                        <TESTCONTAINERS_REUSE_ENABLE>true</TESTCONTAINERS_REUSE_ENABLE>
+                    </environmentVariables>
                 </configuration>
             </plugin>
         </plugins>
