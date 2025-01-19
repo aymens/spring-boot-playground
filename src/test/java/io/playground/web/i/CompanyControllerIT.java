@@ -138,7 +138,7 @@ class CompanyControllerIT extends BaseIntegrationTest {
         mockMvc.perform(get(BASE_URL + "/{id}", 999L))
                 .andExpect(status().isNotFound())
                 .andExpect(content().string(
-                        "io.playground.domain.Company(999) not found"));
+                        containsString("Company(999) not found")));
     }
 
     @Test

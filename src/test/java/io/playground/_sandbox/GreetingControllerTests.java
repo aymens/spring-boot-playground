@@ -45,7 +45,7 @@ public class GreetingControllerTests {
 
     @Test
 //    @ConvertWith()
-    public void noParamGreetingShouldReturnDefaultMessage() throws Exception {
+    public void getGreeting_WithoutParam_ReturnsDefaultMessage() throws Exception {
 //@EnableAspectJAutoProxy
 //        Objects.requireNonNullElse()
 
@@ -62,7 +62,7 @@ public class GreetingControllerTests {
     }
 
     @Test
-    public void paramGreetingShouldReturnTailoredMessage() throws Exception {
+    public void getGreeting_WithNameParam_ReturnsTailoredMessage() throws Exception {
 
         this.mockMvc.perform(get("/api/v1/greeting").param("name", "Spring Community"))
                 .andDo(print())

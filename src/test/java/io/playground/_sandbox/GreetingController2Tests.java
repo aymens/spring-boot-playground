@@ -49,7 +49,7 @@ public class GreetingController2Tests {
     }
 
     @Test
-    public void noParamGreetingShouldReturnDefaultMessage() throws Exception {
+    public void getGreeting_WithoutParam_ReturnsDefaultMessage() throws Exception {
         this.mockMvc.perform(get("/api/v1/greeting"))
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -57,7 +57,7 @@ public class GreetingController2Tests {
     }
 
     @Test
-    public void paramGreetingShouldReturnTailoredMessage() throws Exception {
+    public void getGreeting_WithNameParam_ReturnsTailoredMessage() throws Exception {
         this.mockMvc.perform(get("/api/v1/greeting").param("name", "Spring Community"))
                 .andDo(print())
                 .andExpect(status().isOk())

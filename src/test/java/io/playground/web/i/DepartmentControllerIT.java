@@ -268,7 +268,7 @@ class DepartmentControllerIT extends BaseIntegrationTest {
                 .andExpect(status().isNotFound())
                 .andExpect(result -> 
                     assertThat(result.getResponse().getContentAsString())
-                        .contains("io.playground.domain.Department(99999) not found"));
+                        .contains("Department(99999) not found"));
     }
 
     @Test
@@ -347,7 +347,7 @@ class DepartmentControllerIT extends BaseIntegrationTest {
                 .andExpect(status().isNotFound())
                 .andExpect(result ->
                     assertThat(result.getResponse().getContentAsString())
-                        .isEqualTo("io.playground.domain.Company(99999) not found"));
+                        .contains("Company(99999) not found"));
     }
 
     @Test

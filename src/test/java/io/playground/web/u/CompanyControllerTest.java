@@ -34,7 +34,7 @@ class CompanyControllerTest {
     private ObjectMapper objectMapper;
 
     @Test
-    void shouldCreateCompany() throws Exception {
+    void createCompany_WithValidInput_ReturnsCreated() throws Exception {
         CompanyIn input = CompanyIn.builder()
                 .name("Acme")
                 .taxId("1234567890")
@@ -59,7 +59,7 @@ class CompanyControllerTest {
     }
 
     @Test
-    void shouldRejectMissingFields() throws Exception {
+    void createCompany_WithMissingFields_ReturnsBadRequest() throws Exception {
         CompanyIn input = CompanyIn.builder().build();// Missing all required fields
 
         mockMvc.perform(post("/api/companies")
@@ -71,7 +71,7 @@ class CompanyControllerTest {
     }
 
     @Test
-    void shouldRejectTooLongName() throws Exception {
+    void createCompany_WithNameTooLong_ReturnsBadRequest() throws Exception {
         CompanyIn input = CompanyIn.builder().build();
         input.setName("A".repeat(101));  // > 100 chars
         input.setTaxId("1234567890");
@@ -84,7 +84,7 @@ class CompanyControllerTest {
     }
 
     @Test
-    void shouldRejectInvalidTaxIdFormat() throws Exception {
+    void createCompany_WithInvalidTaxId_ReturnsBadRequest() throws Exception {
         CompanyIn input = CompanyIn.builder()
                 .name("Acme")
                 .taxId("123") // Not 10 digits
@@ -98,7 +98,7 @@ class CompanyControllerTest {
     }
 
     @Test
-    void shouldRejectNonNumericTaxId() throws Exception {
+    void createCompany_WithNonNumericTaxId_ReturnsBadRequest() throws Exception {
         CompanyIn input = CompanyIn.builder()
                 .name("Acme")
                 .taxId("123ABC4567")
@@ -113,7 +113,7 @@ class CompanyControllerTest {
     }
 
     @Test
-    void shouldHandleDuplicateTaxId() throws Exception {
+    void createCompany_WithDuplicateTaxId_ReturnsBadRequest() throws Exception {
         CompanyIn input = CompanyIn.builder()
                 .name("Acme")
                 .taxId("1234567890")
@@ -130,7 +130,7 @@ class CompanyControllerTest {
     }
 
     @Test
-    void shouldGetCompanyById() throws Exception {
+    void getCompany_WithValidId_ReturnsCompany() throws Exception {
         CompanyOut output = CompanyOut.builder()
                 .id(1L)
                 .name("Acme")
@@ -147,13 +147,13 @@ class CompanyControllerTest {
     }
 
     @Test
-    void shouldRejectNegativeId() throws Exception {
+    void getCompany_WithNegativeId_ReturnsBadRequest() throws Exception {
         mockMvc.perform(get("/api/companies/-1"))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
-    void shouldHandleCompanyNotFound() throws Exception {
+    void getCompany_WithInvalidId_ReturnsBadRequest() throws Exception {
         when(companyService.getById(999L))
                 .thenThrow(new BusinessException("Company not found: 999"));
 
@@ -163,7 +163,7 @@ class CompanyControllerTest {
     }
 
     @Test
-    void shouldGetAllCompanies() throws Exception {
+    void getCompanies_WithExistingData_ReturnsList() throws Exception {
         CompanyOut company1 = CompanyOut.builder()
                 .id(1L)
                 .name("Acme").build();
@@ -182,7 +182,7 @@ class CompanyControllerTest {
     }
 
     @Test
-    void shouldReturnEmptyList() throws Exception {
+    void getCompanies_WhenEmpty_ReturnsList() throws Exception {
         when(companyService.getAll()).thenReturn(Collections.emptyList());
 
         mockMvc.perform(get("/api/companies"))
@@ -191,7 +191,7 @@ class CompanyControllerTest {
     }
 
     @Test
-    void shouldDeleteCompany() throws Exception {
+    void deleteCompany_WhenExists_ReturnsNoContent() throws Exception {
         doNothing().when(companyService).delete(1L);
 
         mockMvc.perform(delete("/api/companies/1"))
@@ -201,7 +201,7 @@ class CompanyControllerTest {
     }
 
     @Test
-    void shouldHandleDeleteNonExistentCompany() throws Exception {
+    void deleteCompany_WithInvalidId_ReturnsBadRequest() throws Exception {
         doThrow(new BusinessException("Company not found: 999"))
                 .when(companyService).delete(999L);
 
@@ -211,7 +211,7 @@ class CompanyControllerTest {
     }
 
     @Test
-    void shouldRejectInvalidContentType() throws Exception {
+    void createCompany_WithInvalidContentType_ReturnsUnsupportedMediaType() throws Exception {
         CompanyIn input = CompanyIn.builder()
                 .name("Acme")
                 .taxId("1234567890")

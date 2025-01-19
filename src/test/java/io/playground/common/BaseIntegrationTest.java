@@ -7,9 +7,9 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 
 @Slf4j
-@ExtendWith(DatabaseExtension.class)
 @SpringBootTest
 @AutoConfigureMockMvc
+@ExtendWith(DatabaseExtension.class)
 public abstract class BaseIntegrationTest {
 
 }

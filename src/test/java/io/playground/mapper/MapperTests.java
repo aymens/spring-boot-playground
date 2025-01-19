@@ -30,12 +30,12 @@ class MapperTests {
     @Nested
     class CompanyMapperTests {
         @Test
-        void shouldHandleNull() {
+        void map_WithNullInput_ReturnsNull() {
             assertThat(companyMapper.map((CompanyIn) null)).isNull();
         }
 
         @Test
-        void shouldMapValidCompany() {
+        void map_WithValidCompany_ReturnsExpectedDomain() {
             CompanyIn in = CompanyIn.builder()
                     .name("Acme Corp")
                     .taxId("1234567890").build();
@@ -49,7 +49,7 @@ class MapperTests {
         }
 
         @Test
-        void shouldMapToOut() {
+        void map_WithValidDomain_ReturnsExpectedDto() {
             Company company = new Company();
             company.setId(1L);
             company.setName("Acme Corp");
@@ -68,14 +68,14 @@ class MapperTests {
     @Nested
     class DepartmentMapperTests {
         @Test
-        void shouldHandleNulls() {
+        void map_WithNullInput_ReturnsNull() {
             assertThat(departmentMapper.map(null, null)).isNull();
             assertThat(departmentMapper.map(DepartmentIn.builder().build(), null)).isNull();
             assertThat(departmentMapper.map(null, new Company())).isNull();
         }
 
         @Test
-        void shouldMapValidDepartment() {
+        void map_WithValidDepartment_ReturnsExpectedDomain() {
             val in = DepartmentIn.builder()
                     .name("IT").build();
 
@@ -90,7 +90,7 @@ class MapperTests {
         }
 
         @Test
-        void shouldMapToOut() {
+        void map_WithValidDepartmentDomain_ReturnsExpectedDto() {
             Company company = new Company();
             company.setId(1L);
 
@@ -110,14 +110,14 @@ class MapperTests {
     @Nested
     class EmployeeMapperTests {
         @Test
-        void shouldHandleNulls() {
+        void map_WithNullValues_ReturnsNull() {
             assertThat(employeeMapper.map(null, null)).isNull();
             assertThat(employeeMapper.map(EmployeeIn.builder().build(), null)).isNull();
             assertThat(employeeMapper.map(null, new Department())).isNull();
         }
 
         @Test
-        void shouldMapValidEmployee() {
+        void map_WithValidEmployee_ReturnsExpectedDomain () {
             val in = EmployeeIn.builder()
                     .firstName("John")
                     .lastName("Doe")
@@ -139,7 +139,7 @@ class MapperTests {
         }
 
         @Test
-        void shouldMapToOut() {
+        void map_WithValidEmployeeDomain_ReturnsExpectedDto() {
             Department dept = new Department();
             dept.setId(1L);
 

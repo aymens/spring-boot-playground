@@ -33,7 +33,7 @@ class DepartmentControllerTest {
     private ObjectMapper objectMapper;
 
     @Test
-    void shouldCreateDepartment() throws Exception {
+    void createDepartment_WithValidInput_ReturnsCreated() throws Exception {
         DepartmentIn input = DepartmentIn.builder()
                 .name("IT")
                 .companyId(1L)
@@ -57,7 +57,7 @@ class DepartmentControllerTest {
     }
 
     @Test
-    void shouldRejectInvalidDepartment() throws Exception {
+    void createDepartment_WithInvalidInput_ReturnsBadRequest() throws Exception {
         DepartmentIn input = DepartmentIn.builder().build();// Missing required fields
 
         mockMvc.perform(post("/api/departments")
@@ -69,7 +69,7 @@ class DepartmentControllerTest {
     }
 
     @Test
-    void shouldHandleDepartmentNameDuplicateInCompany() throws Exception {
+    void createDepartment_WithDuplicateName_ReturnsBadRequest() throws Exception {
         DepartmentIn input = DepartmentIn.builder()
                 .name("IT")
                 .companyId(1L)
@@ -86,7 +86,7 @@ class DepartmentControllerTest {
     }
 
     @Test
-    void shouldHandleCompanyNotFoundOnCreate() throws Exception {
+    void createDepartment_WithInvalidCompany_ReturnsNotFound() throws Exception {
         DepartmentIn input = DepartmentIn.builder()
                 .name("IT")
                 .companyId(999L)
@@ -103,7 +103,7 @@ class DepartmentControllerTest {
     }
 
     @Test
-    void shouldGetDepartmentById() throws Exception {
+    void getDepartment_WithValidId_ReturnsDepartment() throws Exception {
         DepartmentOut output = DepartmentOut.builder()
                 .id(1L)
                 .name("IT")
@@ -120,7 +120,7 @@ class DepartmentControllerTest {
     }
 
     @Test
-    void shouldHandleDepartmentNotFound() throws Exception {
+    void getDepartment_WithInvalidId_ReturnsBadRequest() throws Exception {
         when(departmentService.getById(999L))
                 .thenThrow(new BusinessException("Department not found: 999"));
 
@@ -130,7 +130,7 @@ class DepartmentControllerTest {
     }
 
     @Test
-    void shouldGetDepartmentsByCompanyId() throws Exception {
+    void getDepartments_ByCompanyId_ReturnsList() throws Exception {
         DepartmentOut dept1 = DepartmentOut.builder()
                 .id(1L)
                 .name("IT")
@@ -153,7 +153,7 @@ class DepartmentControllerTest {
     }
 
     @Test
-    void shouldHandleCompanyNotFoundForDepartmentList() throws Exception {
+    void getDepartments_WithInvalidCompany_ReturnsBadRequest() throws Exception {
         when(departmentService.getByCompanyId(999L))
                 .thenThrow(new BusinessException("Company not found: 999"));
 
@@ -163,7 +163,7 @@ class DepartmentControllerTest {
     }
 
     @Test
-    void shouldDeleteDepartment() throws Exception {
+    void deleteDepartment_WhenExists_ReturnsNoContent() throws Exception {
         doNothing().when(departmentService).delete(eq(1L), isNull());
 
         mockMvc.perform(delete("/api/departments/1"))
@@ -173,7 +173,7 @@ class DepartmentControllerTest {
     }
 
     @Test
-    void shouldHandleDeleteNonExistentDepartment() throws Exception {
+    void deleteDepartment_WithInvalidId_ReturnsBadRequest() throws Exception {
         doThrow(new BusinessException("Department not found: 999"))
                 .when(departmentService).delete(eq(999L), isNull());
 

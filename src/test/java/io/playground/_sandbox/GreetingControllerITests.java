@@ -44,7 +44,7 @@ public class GreetingControllerITests {
     SomeService someService;
 
     @Test
-    public void noParamGreetingShouldReturnDefaultMessage() {
+    public void getGreeting_WithoutParam_ReturnsDefaultMessage() {
         val response = template.getForEntity("/api/v1/greeting", String.class);
 
         // Print the response body
@@ -57,7 +57,7 @@ public class GreetingControllerITests {
     }
 
     @Test
-    public void paramGreetingShouldReturnTailoredMessage() {
+    public void getGreeting_WithNameParam_ReturnsTailoredMessage() {
         val response = template.getForEntity(
                 UriComponentsBuilder.fromPath("/api/v1/greeting")
                         .queryParam("name", "{name}")
@@ -75,7 +75,7 @@ public class GreetingControllerITests {
     }
 
     @Test @Disabled
-    public void investigateUriEncoding() {
+    public void getDebug_WithEncodedUri_ValidatesEncoding() {
         // Direct approach
         String directUri = UriComponentsBuilder.fromPath("/api/v1/greeting")
                 .queryParam("name", "Spring Community")
@@ -98,7 +98,7 @@ public class GreetingControllerITests {
     }
 
     @Test @Disabled
-    public void compareEncodings() {
+    public void getDebug_WithDifferentEncodings_ComparesResults() {
         // Original string
         String value = "Spring Community";
 
@@ -117,7 +117,7 @@ public class GreetingControllerITests {
     }
 
     @Test @Disabled
-    public void debugParameterResolution() {
+    public void getDebug_WithQueryParams_ValidatesResolution() {
         // Direct approach
         String directUri = UriComponentsBuilder.fromPath("/api/v1/debug")
                 .queryParam("name", "Spring Community")

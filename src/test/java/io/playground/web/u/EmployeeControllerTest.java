@@ -36,7 +36,7 @@ class EmployeeControllerTest {
     private ObjectMapper objectMapper;
 
     @Test
-    void shouldCreateEmployee() throws Exception {
+    void createEmployee_WithValidInput_ReturnsCreated() throws Exception {
         EmployeeIn input = EmployeeIn.builder()
                 .firstName("John")
                 .lastName("Doe")
@@ -67,7 +67,7 @@ class EmployeeControllerTest {
     }
 
     @Test
-    void shouldRejectInvalidEmployee() throws Exception {
+    void createEmployee_WithInvalidInput_ReturnsBadRequest() throws Exception {
         EmployeeIn input = EmployeeIn.builder().build();// Missing all required fields
 
         mockMvc.perform(post("/api/employees")
@@ -82,7 +82,7 @@ class EmployeeControllerTest {
     }
 
     @Test
-    void shouldRejectInvalidEmail() throws Exception {
+    void createEmployee_WithInvalidEmail_ReturnsBadRequest() throws Exception {
         EmployeeIn input = EmployeeIn.builder()
                 .firstName("John")
                 .lastName("Doe")
@@ -99,7 +99,7 @@ class EmployeeControllerTest {
     }
 
     @Test
-    void shouldRejectFutureHireDate() throws Exception {
+    void createEmployee_WithFutureDate_ReturnsBadRequest() throws Exception {
         EmployeeIn input = EmployeeIn.builder()
                 .firstName("John")
                 .lastName("Doe")
@@ -116,7 +116,7 @@ class EmployeeControllerTest {
     }
 
     @Test
-    void shouldHandleDuplicateEmail() throws Exception {
+    void createEmployee_WithDuplicateEmail_ReturnsBadRequest() throws Exception {
         EmployeeIn input = EmployeeIn.builder()
                 .firstName("John")
                 .lastName("Doe")
@@ -136,7 +136,7 @@ class EmployeeControllerTest {
     }
 
     @Test
-    void shouldHandleDepartmentNotFound() throws Exception {
+    void createEmployee_WithInvalidDepartment_ReturnsBadRequest() throws Exception {
         EmployeeIn input = EmployeeIn.builder()
                 .firstName("John")
                 .lastName("Doe")
@@ -156,7 +156,7 @@ class EmployeeControllerTest {
     }
 
     @Test
-    void shouldGetEmployeeById() throws Exception {
+    void getEmployee_WithValidId_ReturnsEmployee() throws Exception {
         EmployeeOut output = EmployeeOut.builder()
                 .id(1L)
                 .firstName("John")
@@ -175,7 +175,7 @@ class EmployeeControllerTest {
     }
 
     @Test
-    void shouldGetEmployeesByDepartment() throws Exception {
+    void getEmployees_ByDepartmentId_ReturnsList() throws Exception {
         EmployeeOut employee1 = EmployeeOut.builder()
                 .id(1L)
                 .firstName("John")
@@ -196,7 +196,7 @@ class EmployeeControllerTest {
     }
 
     @Test
-    void shouldReturnEmptyDepartmentEmployeesList() throws Exception {
+    void getEmployees_WhenEmpty_ReturnsList() throws Exception {
         when(employeeService.getByDepartmentId(1L)).thenReturn(Collections.emptyList());
 
         mockMvc.perform(get("/api/employees/department/1"))
@@ -205,7 +205,7 @@ class EmployeeControllerTest {
     }
 
     @Test
-    void shouldDeleteEmployee() throws Exception {
+    void deleteEmployee_WhenExists_ReturnsNoContent() throws Exception {
         doNothing().when(employeeService).delete(1L);
 
         mockMvc.perform(delete("/api/employees/1"))
@@ -213,7 +213,7 @@ class EmployeeControllerTest {
     }
 
     @Test
-    void shouldHandleDeleteNonExistentEmployee() throws Exception {
+    void deleteEmployee_WithInvalidId_ReturnsBadRequest() throws Exception {
         doThrow(new BusinessException("Employee not found: 999"))
                 .when(employeeService).delete(999L);
 
