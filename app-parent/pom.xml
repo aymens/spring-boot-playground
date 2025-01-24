@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>io.playground</groupId>
+        <artifactId>spring-boot-playground</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>app-parent</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>app-domain</module>
+        <module>app-core</module>
+        <module>app-api</module>
+        <module>app</module>
+    </modules>
+
+    <!--    <properties>-->
+    <!--        <app-domain.version>${project.version}</app-domain.version>-->
+    <!--        <app-core.version>${project.version}</app-core.version>-->
+    <!--        <app-api.version>${project.version}</app-api.version>-->
+    <!--        <app.version>${project.version}</app.version>-->
+    <!--    </properties>-->
+
+    <!--    <properties>-->
+    <!--        <maven.compiler.source>22</maven.compiler.source>-->
+    <!--        <maven.compiler.target>22</maven.compiler.target>-->
+    <!--        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>-->
+    <!--    </properties>-->
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
