@@ -29,7 +29,7 @@
         <org.mapstruct.version>1.5.5.Final</org.mapstruct.version>
 
         <!-- new -->
-        <spring.boot.version>3.3.7</spring.boot.version>
+        <spring-boot.version>3.3.7</spring-boot.version>
         <spring-boot-admin.version>3.4.1</spring-boot-admin.version>
         <!--        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>-->
         <!--        <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>-->
@@ -159,6 +159,12 @@
             <version>2.10.0</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+            <optional>true</optional>
+        </dependency>
+
 
         <!--        &lt;!&ndash;	data, jpa, liquibase	&ndash;&gt;-->
         <!--        &lt;!&ndash; Spring Boot Starter JPA &ndash;&gt;-->
@@ -263,6 +269,10 @@
                                 <groupId>org.projectlombok</groupId>
                                 <artifactId>lombok-mapstruct-binding</artifactId>
                                 <version>0.2.0</version>
+                            </path>
+                            <path>
+                                <groupId>org.springframework.boot</groupId>
+                                <artifactId>spring-boot-configuration-processor</artifactId>
                             </path>
                         </annotationProcessorPaths>
                     </configuration>

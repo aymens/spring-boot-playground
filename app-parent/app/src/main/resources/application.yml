@@ -2,9 +2,9 @@ playground:
   api:
     rest:
       data-generator:
-        enabled: ${PLAYGROUND_API_REST_DATA_GENERATOR_ENABLED:false} #TODO TEST
+        enabled: ${PLAYGROUND_API_REST_DATA_GENERATOR_ENABLED:false}
       sandbox:
-        enabled: ${PLAYGROUND_API_REST_SANDBOX_ENABLED:false} #TODO TEST
+        enabled: ${PLAYGROUND_API_REST_SANDBOX_ENABLED:false}
 
 server:
   port: ${SERVER_PORT:8088}
@@ -23,7 +23,8 @@ spring:
     admin:
       client:
         url: ${SPRING_BOOT_ADMIN_CLIENT_URL:http://localhost:8081/}
-
+        instance:
+          service-url: ${SPRING_BOOT_ADMIN_CLIENT_INSTANCE_SERVICE_URL:http://host.docker.internal:8088}
   datasource:
     url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/sandbox-rest-app}
     username: ${SPRING_DATASOURCE_USERNAME:sandbox-rest-app-user}
@@ -58,18 +59,22 @@ spring:
 management:
   endpoint:
 #    metrics:
-#      enabled: false
+#      enabled: true
+##      enabled: false
     shutdown:
       enabled: ${MANAGEMENT_ENDPOINT_SHUTDOWN_ENABLED:true}
   endpoints:
     web:
       exposure:
 #        include: "*"
-        include: ${MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE:health,info,prometheus}
+#        include: ${MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE:health,info,prometheus}
+        include: ${MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE:health,info,metrics,prometheus}
   prometheus:
     metrics:
       export:
         enabled: ${MANAGEMENT_PROMETHEUS_METRICS_EXPORT_ENABLED:true}
+#  security:
+#    enabled: ${MANAGEMENT_SECURITY_ENABLED:false}
 
 logging:
   level:

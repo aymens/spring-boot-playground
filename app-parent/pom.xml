@@ -21,26 +21,4 @@
         <module>app</module>
     </modules>
 
-    <!--    <properties>-->
-    <!--        <app-domain.version>${project.version}</app-domain.version>-->
-    <!--        <app-core.version>${project.version}</app-core.version>-->
-    <!--        <app-api.version>${project.version}</app-api.version>-->
-    <!--        <app.version>${project.version}</app.version>-->
-    <!--    </properties>-->
-
-    <!--    <properties>-->
-    <!--        <maven.compiler.source>22</maven.compiler.source>-->
-    <!--        <maven.compiler.target>22</maven.compiler.target>-->
-    <!--        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>-->
-    <!--    </properties>-->
-
-    <build>
-        <plugins>
-<!--            <plugin>-->
-<!--                <groupId>org.apache.maven.plugins</groupId>-->
-<!--                <artifactId>maven-compiler-plugin</artifactId>-->
-<!--            </plugin>-->
-        </plugins>
-    </build>
-
 </project>
