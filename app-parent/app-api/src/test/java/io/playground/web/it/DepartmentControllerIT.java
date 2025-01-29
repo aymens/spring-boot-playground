@@ -1,7 +1,7 @@
 package io.playground.web.it;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.playground.it.BaseMvcIntegrationTestPg16;
+import io.playground.it.BaseMvcIntegrationTest_Pg16;
 import io.playground.domain.Company;
 import io.playground.domain.Department;
 import io.playground.domain.Employee;
@@ -26,7 +26,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Slf4j
-class DepartmentControllerIT extends BaseMvcIntegrationTestPg16 {
+class DepartmentControllerIT extends BaseMvcIntegrationTest_Pg16 {
 
     @Autowired
     private MockMvc mockMvc;

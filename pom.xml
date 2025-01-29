@@ -2,24 +2,25 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <!--    <parent>-->
-    <!--        <groupId>org.springframework.boot</groupId>-->
-    <!--        <artifactId>spring-boot-starter-parent</artifactId>-->
-    <!--        <version>3.3.7</version>-->
-    <!--        <relativePath/> &lt;!&ndash; lookup parent from repository &ndash;&gt;-->
-    <!--    </parent>-->
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.3.7</version>
+        <relativePath/> <!-- lookup parent from repository -->
+    </parent>
 
     <groupId>io.playground</groupId>
     <artifactId>spring-boot-playground</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <!--    <name>Spring Boot Playground</name>-->
-    <!--    <description>Demo project for Spring Boot</description>-->
+    <name>Spring Boot Playground</name>
+    <description>Demo project for Spring Boot</description>
     <packaging>pom</packaging>
 
     <modules>
         <module>app-parent</module>
         <module>test-utils</module>
-        <!-- common, sba, helm, iac... to come -->
+        <module>sba</module>
+        <!-- common, helm, iac... others to come -->
     </modules>
 
     <properties>
@@ -29,7 +30,11 @@
 
         <!-- new -->
         <spring.boot.version>3.3.7</spring.boot.version>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <spring-boot-admin.version>3.4.1</spring-boot-admin.version>
+        <!--        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>-->
+        <!--        <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>-->
+        <!--        <maven-surefire-plugin.version>3.2.5</maven-surefire-plugin.version>-->
+        <!--        <maven-dependency-plugin.version>3.6.1</maven-dependency-plugin.version>-->
     </properties>
 
     <!--    <dependencyManagement>-->
@@ -46,14 +51,14 @@
 
     <dependencyManagement>
         <dependencies>
-            <!-- Import Spring Boot BOM -->
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-dependencies</artifactId>
-                <version>${spring.boot.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
+            <!--            &lt;!&ndash; Import Spring Boot BOM &ndash;&gt;-->
+            <!--            <dependency>-->
+            <!--                <groupId>org.springframework.boot</groupId>-->
+            <!--                <artifactId>spring-boot-dependencies</artifactId>-->
+            <!--                <version>${spring.boot.version}</version>-->
+            <!--                <type>pom</type>-->
+            <!--                <scope>import</scope>-->
+            <!--            </dependency>-->
             <dependency>
                 <groupId>org.testcontainers</groupId>
                 <artifactId>testcontainers-bom</artifactId>
@@ -207,18 +212,38 @@
     </dependencies>
 
     <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <!--                    <execution>-->
+                    <!--                        <id>sources</id>-->
+                    <!--                        <phase>initialize</phase>&lt;!&ndash; TODO DELETE later after industrialization, or add a profile to distinguish between dev build and pr ones&ndash;&gt;-->
+                    <!--                        <goals>-->
+                    <!--                            <goal>sources</goal>-->
+                    <!--                        </goals>-->
+                    <!--                        <configuration>-->
+                    <!--                            <classifier>sources</classifier>-->
+                    <!--                        </configuration>-->
+                    <!--                    </execution>-->
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+            </plugin>
+        </plugins>
         <pluginManagement>
             <plugins>
-                <!--                <plugin>-->
-                <!--                    <groupId>org.springframework.boot</groupId>-->
-                <!--                    <artifactId>spring-boot-maven-plugin</artifactId>-->
-                <!--                </plugin>-->
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
+                    <!--                    <version>${maven-compiler-plugin.version}</version>-->
                     <configuration>
-                        <source>${java.version}</source> <!-- Use the property here -->
-                        <target>${java.version}</target>
+                        <!--                        <source>${java.version}</source> &lt;!&ndash; Use the property here &ndash;&gt;-->
+                        <!--                        <target>${java.version}</target>-->
+                        <release>${java.version}</release>  <!-- Changed from source/target to release -->
                         <parameters>true</parameters>
                         <!--                    <compilerArgs>-->
                         <!--                        &#45;&#45;enable-preview-->
@@ -244,18 +269,8 @@
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-dependency-plugin</artifactId>
-                    <executions>
-                        <execution>
-                            <goals>
-                                <goal>properties</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
+                    <!--                    <version>${maven-surefire-plugin.version}</version>-->
                     <configuration>
                         <argLine>
                             -javaagent:"${settings.localRepository}/org/mockito/mockito-core/5.14.2/mockito-core-5.14.2.jar"
@@ -266,10 +281,24 @@
                         </environmentVariables>
                     </configuration>
                 </plugin>
+                <!--                <plugin>-->
+                <!--                    <groupId>org.springframework.boot</groupId>-->
+                <!--                    <artifactId>spring-boot-maven-plugin</artifactId>-->
+                <!--&lt;!&ndash;                    <version>${spring.boot.version}</version>&ndash;&gt;-->
+                <!--                </plugin>-->
                 <plugin>
-                    <groupId>org.springframework.boot</groupId>
-                    <artifactId>spring-boot-maven-plugin</artifactId>
-                    <version>${spring.boot.version}</version>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-dependency-plugin</artifactId>
+                    <!--                    <version>${maven-dependency-plugin.version}</version>-->
+                    <executions>
+                        <execution>
+                            <id>properties</id>
+                            <phase>initialize</phase>
+                            <goals>
+                                <goal>properties</goal>
+                            </goals>
+                        </execution>
+                    </executions>
                 </plugin>
             </plugins>
         </pluginManagement>

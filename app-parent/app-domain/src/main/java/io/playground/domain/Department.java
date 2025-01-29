@@ -32,5 +32,6 @@ public class Department {
     @OneToMany(mappedBy = "department", cascade = CascadeType.ALL)
     @ToString.Exclude // Prevent recursive toString()
     @EqualsAndHashCode.Exclude // Prevent recursion
-    private List<Employee> employees = new ArrayList<>();
+//    @Builder.Default
+    private List<Employee> employees/* = new ArrayList<>()*/;
 }

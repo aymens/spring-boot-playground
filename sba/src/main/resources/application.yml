@@ -1,0 +1,11 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: spring-boot-admin
+
+  boot:
+    admin:
+      ui:
+        title: Spring Boot Playground Admin Server

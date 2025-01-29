@@ -8,8 +8,8 @@ import org.mapstruct.*;
 
 import static org.mapstruct.MappingConstants.ComponentModel.SPRING;
 
-@Mapper(componentModel = SPRING/*, nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS*/)
-public interface DepartmentMapper {//TODO test
+@Mapper(componentModel = SPRING)
+public interface DepartmentMapper {
 
     @Mapping(target = "companyId", source = "company.id")
     DepartmentOut map(Department department);

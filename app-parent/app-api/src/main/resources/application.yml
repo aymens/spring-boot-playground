@@ -11,41 +11,41 @@ spring:
   application:
     name: ${SPRING_APPLICATION_NAME:spring-boot-playground}
 
-  boot:
-    admin:
-      client:
-        url: ${SPRING_BOOT_ADMIN_CLIENT_URL:http://localhost:8081/}
+#  boot:
+#    admin:
+#      client:
+#        url: ${SPRING_BOOT_ADMIN_CLIENT_URL:http://localhost:8081/}
 
-#  datasource:
-#    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/sandbox-rest-app}
-#    username: ${SPRING_DATASOURCE_USERNAME:sandbox-rest-app-user}
-#    password: ${SPRING_DATASOURCE_PASSWORD:sandbox-rest-app-user-pwd}
-#    driver-class-name: ${SPRING_DATASOURCE_DRIVER_CLASS_NAME:org.postgresql.Driver}
-##    hikari:
-##      connection-test-query: SELECT 1
-##      connection-timeout:
-##      idle-timeout:
-##      keepalive-time:
-##      validation-timeout:
-##      max-lifetime:
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/sandbox-rest-app}
+    username: ${SPRING_DATASOURCE_USERNAME:sandbox-rest-app-user}
+    password: ${SPRING_DATASOURCE_PASSWORD:sandbox-rest-app-user-pwd}
+    driver-class-name: ${SPRING_DATASOURCE_DRIVER_CLASS_NAME:org.postgresql.Driver}
+#    hikari:
+#      connection-test-query: SELECT 1
+#      connection-timeout:
+#      idle-timeout:
+#      keepalive-time:
+#      validation-timeout:
+#      max-lifetime:
 
-#  jpa:
-#    show-sql: ${SPRING_JPA_SHOW_SQL:true}    # Helpful during development to see the SQL
-#    generate-ddl: ${SPRING_JPA_GENERATE_DDL:false} # We want Liquibase, not Hibernate, to manage our schema
-##    properties:
-##      hibernate:
-##        format_sql: true
-#        # Show values in queries instead of ?
-##        type: trace
-##    hibernate:
-##      ddl-auto: none  # We want Liquibase, not Hibernate, to manage our schema
-##    database-platform: org.hibernate.dialect.PostgreSQLDialect
+  jpa:
+    show-sql: ${SPRING_JPA_SHOW_SQL:true}    # Helpful during development to see the SQL
+    generate-ddl: ${SPRING_JPA_GENERATE_DDL:false} # We want Liquibase, not Hibernate, to manage our schema
+#    properties:
+#      hibernate:
+#        format_sql: true
+        # Show values in queries instead of ?
+#        type: trace
+#    hibernate:
+#      ddl-auto: none  # We want Liquibase, not Hibernate, to manage our schema
+#    database-platform: org.hibernate.dialect.PostgreSQLDialect
 
 
-#  liquibase:
-##    change-log: classpath:db/changelog/db.changelog-master.yaml
-#    change-log: ${SPRING_LIQUIBASE_CHANGE_LOG:classpath:db/changelog/db.changelog-master.xml}
-#    enabled: ${SPRING_LIQUIBASE_ENABLED:true}
+  liquibase:
+#    change-log: classpath:db/changelog/db.changelog-master.yaml
+    change-log: ${SPRING_LIQUIBASE_CHANGE_LOG:classpath:db/changelog/db.changelog-master.xml}
+    enabled: ${SPRING_LIQUIBASE_ENABLED:true}
 
 #management:
 #  endpoint:
@@ -64,9 +64,9 @@ spring:
 #        enabled: ${MANAGEMENT_PROMETHEUS_METRICS_EXPORT_ENABLED:true}
 #        include: health,info,shutdown
 
-#logging:
-#  level:
-##    org.hibernate.SQL: DEBUG
-#    org.hibernate.orm.jdbc.bind: ${LOGGING_LEVEL_ORG_HIBERNATE_ORM_JDBC_BIND:TRACE}
-##    org:
-##      springdoc: DEBUG
+logging:
+  level:
+#    org.hibernate.SQL: DEBUG
+    org.hibernate.orm.jdbc.bind: ${LOGGING_LEVEL_ORG_HIBERNATE_ORM_JDBC_BIND:TRACE}
+#    org:
+#      springdoc: DEBUG

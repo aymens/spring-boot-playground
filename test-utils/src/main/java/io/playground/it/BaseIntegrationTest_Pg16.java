@@ -8,6 +8,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 @SpringBootTest
 @AutoConfigureMockMvc
 @ExtendWith(DatabaseExtension_Pg16.class)
-public abstract class BaseIntegrationTestPg16 {//TODO going to test-utils, name must make it clear it's a pg16
+public abstract class BaseIntegrationTest_Pg16 {
 
 }

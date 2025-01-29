@@ -12,11 +12,20 @@
 
     <artifactId>app</artifactId>
 
+    <properties>
+        <start-class>io.playground.PlaygroundApplication</start-class>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>io.playground</groupId>
             <artifactId>app-api</artifactId>
             <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>de.codecentric</groupId>
+            <artifactId>spring-boot-admin-starter-client</artifactId>
+            <version>3.3.3</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -39,6 +48,9 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <mainClass>${start-class}</mainClass>
+                </configuration>
             </plugin>
         </plugins>
     </build>

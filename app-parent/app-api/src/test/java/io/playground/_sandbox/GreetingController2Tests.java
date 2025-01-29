@@ -15,6 +15,7 @@
  */
 package io.playground._sandbox;
 
+import io.playground._sandbox.SomeService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

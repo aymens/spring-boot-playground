@@ -1,6 +1,7 @@
 package io.playground._sandbox;
 
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,6 +19,11 @@ import java.util.concurrent.atomic.AtomicLong;
 
 @RequestMapping("api")
 @RestController
+@ConditionalOnProperty(
+        prefix = "playground.api.rest",
+        name = "sandbox.enabled",
+        havingValue = "true",
+        matchIfMissing = false)
 public class GreetingController {
 
     private final SomeService someService;
