@@ -1,9 +1,10 @@
 package io.playground.domain;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -25,13 +26,14 @@ public class Department {
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "company_id", nullable = false)
-    @ToString.Exclude // Prevent recursive toString()
-    @EqualsAndHashCode.Exclude // Prevent recursion
+    @ToString.Exclude // Prevent cycle
+    @EqualsAndHashCode.Exclude // Prevent cycle
+    @JsonBackReference
     private Company company;
 
     @OneToMany(mappedBy = "department", cascade = CascadeType.ALL)
-    @ToString.Exclude // Prevent recursive toString()
-    @EqualsAndHashCode.Exclude // Prevent recursion
-//    @Builder.Default
-    private List<Employee> employees/* = new ArrayList<>()*/;
+    @ToString.Exclude // Prevent cycle
+    @EqualsAndHashCode.Exclude // Prevent cycle
+    @JsonManagedReference
+    private List<Employee> employees;
 }

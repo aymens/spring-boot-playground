@@ -1,10 +1,10 @@
 package io.playground.domain;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -33,9 +33,9 @@ public class Company {
 
     @OneToMany(mappedBy = "company", cascade = CascadeType.ALL)
     @ToString.Exclude
-    @EqualsAndHashCode.Exclude
-//    @Builder.Default
-    private List<Department> departments/* = new ArrayList<>()*/;
+    @EqualsAndHashCode.Exclude // Prevent cycle
+    @JsonManagedReference
+    private List<Department> departments;
 
     @PrePersist
     protected void onCreate() {

@@ -1,5 +1,6 @@
 package io.playground.domain;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -30,8 +31,9 @@ public class Employee {
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "department_id", nullable = false)
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
+    @ToString.Exclude // Prevent cycle
+    @EqualsAndHashCode.Exclude // Prevent cycle
+    @JsonBackReference
     private Department department;
 
     @Column(name = "hire_date", nullable = false)

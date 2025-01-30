@@ -1,19 +1,6 @@
-playground:
-  api:
-    rest:
-      data-generator:
-        enabled: ${PLAYGROUND_API_REST_DATA_GENERATOR_ENABLED:false}
-      sandbox:
-        enabled: ${PLAYGROUND_API_REST_SANDBOX_ENABLED:false}
-
 server:
   port: ${SERVER_PORT:8088}
   address: ${SERVER_ADDRESS:0.0.0.0}
-
-springdoc:
-  swagger-ui:
-    path: ${SWAGGER_UI_PATH:/swagger-ui.html}
-  show-actuator: ${SHOW_ACTUATOR:true}
 
 spring:
   application:
@@ -25,6 +12,7 @@ spring:
         url: ${SPRING_BOOT_ADMIN_CLIENT_URL:http://localhost:8081/}
         instance:
           service-url: ${SPRING_BOOT_ADMIN_CLIENT_INSTANCE_SERVICE_URL:http://host.docker.internal:8088}
+
   datasource:
     url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/sandbox-rest-app}
     username: ${SPRING_DATASOURCE_USERNAME:sandbox-rest-app-user}
@@ -49,12 +37,23 @@ spring:
 #    hibernate:
 #      ddl-auto: none  # We want Liquibase, not Hibernate, to manage our schema
 #    database-platform: org.hibernate.dialect.PostgreSQLDialect
-
-
   liquibase:
 #    change-log: classpath:db/changelog/db.changelog-master.yaml
     change-log: ${SPRING_LIQUIBASE_CHANGE_LOG:classpath:db/changelog/db.changelog-master.xml}
     enabled: ${SPRING_LIQUIBASE_ENABLED:true}
+
+springdoc:
+  swagger-ui:
+    path: ${SWAGGER_UI_PATH:/swagger-ui.html}
+  show-actuator: ${SHOW_ACTUATOR:true}
+
+playground:
+  api:
+    rest:
+      data-generator:
+        enabled: ${PLAYGROUND_API_REST_DATA_GENERATOR_ENABLED:false}
+      sandbox:
+        enabled: ${PLAYGROUND_API_REST_SANDBOX_ENABLED:false}
 
 management:
   endpoint:
@@ -62,13 +61,14 @@ management:
 #      enabled: true
 ##      enabled: false
     shutdown:
-      enabled: ${MANAGEMENT_ENDPOINT_SHUTDOWN_ENABLED:true}
+      enabled: ${MANAGEMENT_ENDPOINT_SHUTDOWN_ENABLED:false}
   endpoints:
     web:
       exposure:
-#        include: "*"
+#        exclude: shutdown
+        include: "*"
 #        include: ${MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE:health,info,prometheus}
-        include: ${MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE:health,info,metrics,prometheus}
+#        include: ${MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE:health,info,metrics,prometheus}
   prometheus:
     metrics:
       export:
