@@ -29,7 +29,7 @@ public class Employee {
     @Column(name = "email", nullable = false, unique = true)
     private String email;
 
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "department_id", nullable = false)
     @ToString.Exclude // Prevent cycle
     @EqualsAndHashCode.Exclude // Prevent cycle

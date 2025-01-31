@@ -3,6 +3,9 @@ server:
   address: ${SERVER_ADDRESS:0.0.0.0}
 
 spring:
+  output:
+    ansi:
+      enabled: ALWAYS
   application:
     name: ${SPRING_APPLICATION_NAME:spring-boot-playground}
 

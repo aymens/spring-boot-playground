@@ -1,5 +1,6 @@
 package io.playground.web;
 
+import io.playground.conf.ConditionalOnDataGeneratorEnabled;
 import io.playground.domain.Company;
 import io.playground.domain.Department;
 import io.playground.exception.InvalidIdRangeException;
@@ -18,8 +19,9 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import net.datafaker.Faker;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -28,6 +30,7 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.regex.Pattern;
 import java.util.stream.IntStream;
 import java.util.stream.LongStream;
@@ -35,11 +38,7 @@ import java.util.stream.Stream;
 
 @RestController
 @RequestMapping("/api/data-gen")
-@ConditionalOnProperty(
-        prefix = "playground.api.rest",
-        name = "data-generator.enabled",
-        havingValue = "true"
-)
+@ConditionalOnDataGeneratorEnabled
 @Slf4j
 @RequiredArgsConstructor
 @Transactional
@@ -97,40 +96,35 @@ public class DataGeneratorController {
                 generateEmployees(departmentId, numEmployees));
     }
 
-
     @DeleteMapping("/companies")
     public ResponseEntity<Void> deleteCompanies(
             @Parameter(description = "One or more ID ranges in the format 'number(-number)?'. For example, '1', '2-4', '5'.")
-            @RequestParam(name = "ids") String... idRanges) {
-        List<Long> ids = parseIdRanges(idRanges)
-                .filter(companyRepository::existsById)
-                .toList();
-        if (!ids.isEmpty()) {
-            companyRepository.deleteAllById(ids);
-        }
+            @RequestParam(name = "ids", defaultValue = "123") String... idRanges) {
+        deleteEntities(parseIdRanges(idRanges), companyRepository);
         return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/departments")
-    public ResponseEntity<Void> deleteDepartments(@RequestParam(name = "ids") String... idRanges) {
-        List<Long> ids = parseIdRanges(idRanges)
-                .filter(departmentRepository::existsById)
-                .toList();
-        if (!ids.isEmpty()) {
-            departmentRepository.deleteAllById(ids);
-        }
+    public ResponseEntity<Void> deleteDepartments(
+            @Parameter(description = "One or more ID ranges in the format 'number(-number)?'. For example, '1', '2-4', '5'.")
+            @RequestParam(name = "ids", defaultValue = "123") String... idRanges) {
+        deleteEntities(parseIdRanges(idRanges), departmentRepository);
         return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/employees")
-    public ResponseEntity<Void> deleteEmployees(@RequestParam(name = "ids") String... idRanges) {
-        List<Long> ids = parseIdRanges(idRanges)
-                .filter(employeeRepository::existsById)
-                .toList();
-        if (!ids.isEmpty()) {
-            employeeRepository.deleteAllById(ids);
-        }
+    public ResponseEntity<Void> deleteEmployees(
+            @Parameter(description = "One or more ID ranges in the format 'number(-number)?'. For example, '1', '2-4', '5'.")
+            @RequestParam(name = "ids", defaultValue = "123") String... idRanges) {
+        deleteEntities(parseIdRanges(idRanges), employeeRepository);
         return ResponseEntity.noContent().build();
+    }
+
+    private <T> void deleteEntities(Stream<Long> ids, JpaRepository<T, Long> repository) {
+        val toDelete = ids.filter(repository::existsById).toList();
+        if (!toDelete.isEmpty()) {
+            repository.deleteAllById(toDelete);
+        }
     }
 
     private Company generateCompany(int numDepartments, int employeesPerDepartment) {
@@ -141,11 +135,7 @@ public class DataGeneratorController {
 
         IntStream.range(0, numDepartments)
                 .forEach(_ -> {
-                    var department = departmentService.create(DepartmentIn.builder()
-                            .name(faker.commerce().department())
-                            .companyId(company.getId())
-                            .build());
-
+                    val department = generateDepartment(company.getId());
                     generateEmployees(department.getId(), employeesPerDepartment);
                 });
 
@@ -166,13 +156,18 @@ public class DataGeneratorController {
 
     private Department generateEmployees(Long departmentId, int count) {
         IntStream.range(0, count)
-                .forEach(_ -> employeeService.create(EmployeeIn.builder()
-                        .firstName(faker.name().firstName())
-                        .lastName(faker.name().lastName())
-                        .email(generateEmail())
-                        .departmentId(departmentId)
-                        .hireDate(generateRandomPastDate())
-                        .build()));
+                .forEach(_ -> {
+                    val firstName = faker.name().firstName();
+                    val lastName = faker.name().lastName();
+                    EmployeeIn employee = EmployeeIn.builder()
+                            .firstName(firstName)
+                            .lastName(lastName)
+                            .email(generateEmail(firstName, lastName))
+                            .departmentId(departmentId)
+                            .hireDate(generateRandomPastDate())
+                            .build();
+                    employeeService.create(employee);
+                });
         return getDepartmentEagerly(departmentId);
     }
 
@@ -184,11 +179,15 @@ public class DataGeneratorController {
         return taxId;
     }
 
-    private String generateEmail() {
-        String email;
-        do {
-            email = faker.internet().emailAddress();
-        } while (employeeRepository.existsByEmail(email));
+    private String generateEmail(String firstName, String lastName) {
+        val localPart = String
+                        .join(".", firstName.toLowerCase(), lastName.toLowerCase())
+                        .replaceAll("[^a-z0-9.]", "");
+        var email = faker.internet().emailAddress(localPart);
+        while (employeeRepository.existsByEmail(email)) {
+            log.warn("Email already exists: {}", email);
+            email = faker.internet().emailAddress(localPart + "." + faker.number().digits(3));
+        }
         return email;
     }
 
@@ -223,7 +222,7 @@ public class DataGeneratorController {
                     }
 
                     long start = Long.parseLong(matcher.group(1));
-                    var end = matcher.group(2) != null ? Long.parseLong(matcher.group(2)) : start;
+                    var end = Long.parseLong(Objects.requireNonNullElse(matcher.group(2), start) + "");
 
                     if (start <= 0 || end < start) {
                         throw new InvalidIdRangeException("Invalid range: " + range);

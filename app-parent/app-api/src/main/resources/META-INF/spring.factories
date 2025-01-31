@@ -1,2 +1,2 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-io.playground.conf.AutoConf
+io.playground.conf.FakerAutoConfiguration

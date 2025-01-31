@@ -24,7 +24,7 @@ public class Department {
     @Column(name = "name", nullable = false)
     private String name;
 
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "company_id", nullable = false)
     @ToString.Exclude // Prevent cycle
     @EqualsAndHashCode.Exclude // Prevent cycle
