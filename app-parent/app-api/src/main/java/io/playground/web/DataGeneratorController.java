@@ -1,6 +1,6 @@
 package io.playground.web;
 
-import io.playground.conf.ConditionalOnDataGeneratorEnabled;
+import io.playground.configuration.ConditionalOnDataGeneratorEnabled;
 import io.playground.domain.Company;
 import io.playground.domain.Department;
 import io.playground.exception.InvalidIdRangeException;
@@ -34,7 +34,6 @@ import java.util.Objects;
 import java.util.regex.Pattern;
 import java.util.stream.IntStream;
 import java.util.stream.LongStream;
-import java.util.stream.Stream;
 
 @RestController
 @RequestMapping("/api/data-gen")
@@ -44,7 +43,7 @@ import java.util.stream.Stream;
 @Transactional
 public class DataGeneratorController {
 
-    private static final Pattern ID_PATTERN = Pattern.compile("(\\d+)(?:-(\\d+))?");
+    private static final Pattern IDS_PATTERN = Pattern.compile("(\\d+)(?:-(\\d+))?");
 
     private final CompanyService companyService;
     private final DepartmentService departmentService;
@@ -65,10 +64,9 @@ public class DataGeneratorController {
     }
 
     @PostMapping("/companies")
-    public ResponseEntity<List<Company>> createCompanies(
-            @RequestParam(defaultValue = "3") int numCompanies,
-            @RequestParam(defaultValue = "3") int numDepartments,
-            @RequestParam(defaultValue = "5") int employeesPerDepartment) {
+    public ResponseEntity<List<Company>> createCompanies(@RequestParam(defaultValue = "3") int numCompanies,
+                                                         @RequestParam(defaultValue = "3") int numDepartments,
+                                                         @RequestParam(defaultValue = "5") int employeesPerDepartment) {
         return ResponseEntity.ok(
                 IntStream.range(0, numCompanies)
                         .mapToObj(_ -> generateCompany(numDepartments, employeesPerDepartment))
@@ -76,22 +74,16 @@ public class DataGeneratorController {
     }
 
     @PostMapping("/companies/{companyId}/departments")
-    public ResponseEntity<Company> addDepartmentToCompany(
-            @PathVariable Long companyId,
-            @Parameter(description = "One or more ID ranges in the format 'number(-number)?'. For example, '1', '2-4', '5'.")
-            @RequestParam(defaultValue = "5") int numEmployees) {
+    public ResponseEntity<Company> addDepartmentToCompany(@PathVariable Long companyId,
+                                                          @RequestParam(defaultValue = "5") int numEmployees) {
         var department = generateDepartment(companyId);
         generateEmployees(department.getId(), numEmployees);
         return ResponseEntity.ok(getCompanyEagerly(companyId));
     }
 
     @PostMapping("/departments/{departmentId}/employees")
-    public ResponseEntity<Department> addEmployeesToDepartment(
-            @PathVariable Long departmentId,
-            @Parameter(
-                    description = "One or more ID ranges in the format 'number(-number)?'. For example, '1', '2-4', '5'."
-            )
-            @RequestParam(defaultValue = "5") int numEmployees) {
+    public ResponseEntity<Department> addEmployeesToDepartment(@PathVariable Long departmentId,
+                                                               @RequestParam(defaultValue = "5") int numEmployees) {
         return ResponseEntity.ok(
                 generateEmployees(departmentId, numEmployees));
     }
@@ -99,7 +91,8 @@ public class DataGeneratorController {
     @DeleteMapping("/companies")
     public ResponseEntity<Void> deleteCompanies(
             @Parameter(description = "One or more ID ranges in the format 'number(-number)?'. For example, '1', '2-4', '5'.")
-            @RequestParam(name = "ids", defaultValue = "123") String... idRanges) {
+            @RequestParam(name = "ids")
+            String... idRanges) {
         deleteEntities(parseIdRanges(idRanges), companyRepository);
         return ResponseEntity.noContent().build();
     }
@@ -107,7 +100,7 @@ public class DataGeneratorController {
     @DeleteMapping("/departments")
     public ResponseEntity<Void> deleteDepartments(
             @Parameter(description = "One or more ID ranges in the format 'number(-number)?'. For example, '1', '2-4', '5'.")
-            @RequestParam(name = "ids", defaultValue = "123") String... idRanges) {
+            @RequestParam(name = "ids") String... idRanges) {
         deleteEntities(parseIdRanges(idRanges), departmentRepository);
         return ResponseEntity.noContent().build();
     }
@@ -115,15 +108,14 @@ public class DataGeneratorController {
     @DeleteMapping("/employees")
     public ResponseEntity<Void> deleteEmployees(
             @Parameter(description = "One or more ID ranges in the format 'number(-number)?'. For example, '1', '2-4', '5'.")
-            @RequestParam(name = "ids", defaultValue = "123") String... idRanges) {
+            @RequestParam(name = "ids") String... idRanges) {
         deleteEntities(parseIdRanges(idRanges), employeeRepository);
         return ResponseEntity.noContent().build();
     }
 
-    private <T> void deleteEntities(Stream<Long> ids, JpaRepository<T, Long> repository) {
-        val toDelete = ids.filter(repository::existsById).toList();
-        if (!toDelete.isEmpty()) {
-            repository.deleteAllById(toDelete);
+    private <T> void deleteEntities(List<Long> idsToDelete, JpaRepository<T, Long> repository) {
+        if (!idsToDelete.isEmpty()) {
+            repository.deleteAllByIdInBatch(idsToDelete);
         }
     }
 
@@ -181,8 +173,8 @@ public class DataGeneratorController {
 
     private String generateEmail(String firstName, String lastName) {
         val localPart = String
-                        .join(".", firstName.toLowerCase(), lastName.toLowerCase())
-                        .replaceAll("[^a-z0-9.]", "");
+                .join(".", firstName.toLowerCase(), lastName.toLowerCase())
+                .replaceAll("[^a-z0-9.]", "");
         var email = faker.internet().emailAddress(localPart);
         while (employeeRepository.existsByEmail(email)) {
             log.warn("Email already exists: {}", email);
@@ -209,20 +201,20 @@ public class DataGeneratorController {
         return department;
     }
 
-    private Stream<Long> parseIdRanges(String... idRanges) {
+    private List<Long> parseIdRanges(String... idRanges) {
         if (idRanges == null || idRanges.length == 0) {
             throw new InvalidIdRangeException("No IDs provided");
         }
 
         return Arrays.stream(idRanges)
                 .flatMap(range -> {
-                    var matcher = ID_PATTERN.matcher(range.trim());
+                    var matcher = IDS_PATTERN.matcher(range.trim());
                     if (!matcher.matches()) {
                         throw new InvalidIdRangeException("Invalid format: " + range);
                     }
 
                     long start = Long.parseLong(matcher.group(1));
-                    var end = Long.parseLong(Objects.requireNonNullElse(matcher.group(2), start) + "");
+                    var end = Long.parseLong(Objects.requireNonNullElse(matcher.group(2), String.valueOf(start)));
 
                     if (start <= 0 || end < start) {
                         throw new InvalidIdRangeException("Invalid range: " + range);
@@ -230,6 +222,7 @@ public class DataGeneratorController {
 
                     return LongStream.rangeClosed(start, end).boxed();
                 })
-                .distinct();
+                .distinct()
+                .toList();
     }
 }

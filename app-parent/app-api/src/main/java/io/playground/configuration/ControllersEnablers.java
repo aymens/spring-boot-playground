@@ -1,4 +1,4 @@
-package io.playground.conf;
+package io.playground.configuration;
 
 import lombok.Getter;
 import lombok.Setter;

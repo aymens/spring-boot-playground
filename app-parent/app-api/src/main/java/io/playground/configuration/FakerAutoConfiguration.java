@@ -1,4 +1,4 @@
-package io.playground.conf;
+package io.playground.configuration;
 
 import net.datafaker.Faker;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
