@@ -32,7 +32,7 @@ public class Company {
     private Instant createdAt;
 
     @OneToMany(mappedBy = "company", cascade = CascadeType.ALL)
-    @ToString.Exclude
+    @ToString.Exclude // Prevent cycle
     @EqualsAndHashCode.Exclude // Prevent cycle
     @JsonManagedReference
     private List<Department> departments;

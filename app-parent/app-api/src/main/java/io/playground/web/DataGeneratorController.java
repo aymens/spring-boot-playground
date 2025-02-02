@@ -30,10 +30,12 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 import java.util.regex.Pattern;
 import java.util.stream.IntStream;
 import java.util.stream.LongStream;
+
+import static java.lang.Long.parseLong;
+import static java.util.Objects.requireNonNullElse;
 
 @RestController
 @RequestMapping("/api/data-gen")
@@ -213,8 +215,8 @@ public class DataGeneratorController {
                         throw new InvalidIdRangeException("Invalid format: " + range);
                     }
 
-                    long start = Long.parseLong(matcher.group(1));
-                    var end = Long.parseLong(Objects.requireNonNullElse(matcher.group(2), String.valueOf(start)));
+                    long start = parseLong(matcher.group(1));
+                    var end = parseLong(requireNonNullElse(matcher.group(2), String.valueOf(start)));
 
                     if (start <= 0 || end < start) {
                         throw new InvalidIdRangeException("Invalid range: " + range);

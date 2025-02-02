@@ -21,4 +21,13 @@
         <module>app</module>
     </modules>
 
+    <dependencies>
+        <dependency>
+            <groupId>io.playground</groupId>
+            <artifactId>test-utils</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
 </project>

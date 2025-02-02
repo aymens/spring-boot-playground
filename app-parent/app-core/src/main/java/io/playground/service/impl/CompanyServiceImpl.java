@@ -61,10 +61,7 @@ public class CompanyServiceImpl implements CompanyService {
         log.debug("Attempting to delete company with id: {}", id);
 
         Company company = companyRepository.findById(id)
-                .orElseThrow(() -> {
-                    log.error("Company not found for deletion: {}", id);
-                    return new BusinessException("Company not found: " + id);
-                });
+                .orElseThrow(() -> NotFoundException.of(Company.class.getName(), id));
 
         boolean hasEmployees = company.getDepartments().stream()
                 .anyMatch(d -> !d.getEmployees().isEmpty());

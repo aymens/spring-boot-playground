@@ -5,7 +5,7 @@ import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.testcontainers.containers.PostgreSQLContainer;
 
-import java.util.Objects;
+import static java.util.Objects.requireNonNullElse;
 
 @Slf4j
 public class DatabaseExtension_Pg16 implements BeforeAllCallback {
@@ -16,7 +16,7 @@ public class DatabaseExtension_Pg16 implements BeforeAllCallback {
     @Override
     public void beforeAll(ExtensionContext context) {
         log.info("Initializing ...");
-        POSTGRES = Objects.requireNonNullElse(POSTGRES, new PostgreSQLContainer<>(
+        POSTGRES = requireNonNullElse(POSTGRES, new PostgreSQLContainer<>(
                 "postgres:16-alpine"
         ).withReuse(true));
 
