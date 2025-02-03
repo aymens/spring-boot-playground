@@ -1,7 +1,6 @@
 package io.playground.web.it;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.playground.test.it.BaseMockMvcIntegrationTest_Pg16;
 import io.playground.domain.Company;
 import io.playground.domain.Department;
 import io.playground.domain.Employee;
@@ -10,6 +9,7 @@ import io.playground.model.DepartmentOut;
 import io.playground.repository.CompanyRepository;
 import io.playground.repository.DepartmentRepository;
 import io.playground.repository.EmployeeRepository;
+import io.playground.test.it.BaseMockMvcIntegrationTest_Pg16;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -366,8 +366,7 @@ class DepartmentControllerIT extends BaseMockMvcIntegrationTest_Pg16 {
         );
 
         // Add an employee to the department
-        Department department = departmentRepository.findById(created.getId())
-                .orElseThrow(() -> new IllegalArgumentException("Department with ID " + created.getId() + " not found"));
+        Department department = departmentRepository.findById(created.getId()).orElseThrow();
 
         Employee employee = Employee.builder()
                 .firstName("John")
@@ -423,9 +422,7 @@ class DepartmentControllerIT extends BaseMockMvcIntegrationTest_Pg16 {
         );
 
         // Add an employee to the first department
-        Department department1 = departmentRepository.findById(created1.getId())
-                .orElseThrow(() -> new IllegalArgumentException(
-                        "Company with ID " + created1.getId() + " not found"));
+        Department department1 = departmentRepository.findById(created1.getId()).orElseThrow();
 
         Employee employee = Employee.builder()
                 .firstName("John")
@@ -445,8 +442,7 @@ class DepartmentControllerIT extends BaseMockMvcIntegrationTest_Pg16 {
         assertThat(departmentRepository.existsById(created1.getId())).isFalse();
         assertThat(employeeRepository.existsById(savedEmployee.getId())).isTrue();
 
-        Employee transferredEmployee = employeeRepository.findById(savedEmployee.getId())
-                .orElseThrow(() -> new IllegalArgumentException("Employee with ID " + savedEmployee.getId() + " not found"));
+        Employee transferredEmployee = employeeRepository.findById(savedEmployee.getId()).orElseThrow();
 
         assertThat(transferredEmployee.getDepartment().getId()).isEqualTo(created2.getId());
     }
@@ -493,8 +489,7 @@ class DepartmentControllerIT extends BaseMockMvcIntegrationTest_Pg16 {
         );
 
         // Add an employee to the first department
-        Department department1 = departmentRepository.findById(created1.getId())
-                .orElseThrow(() -> new IllegalArgumentException("Department not found for ID: " + created1.getId()));
+        Department department1 = departmentRepository.findById(created1.getId()).orElseThrow();
 
         Employee employee = Employee.builder()
                 .firstName("John")
@@ -534,8 +529,7 @@ class DepartmentControllerIT extends BaseMockMvcIntegrationTest_Pg16 {
         );
 
         // Add an employee
-        Department department = departmentRepository.findById(created.getId())
-                .orElseThrow(() -> new IllegalArgumentException("Department not found for ID: " + created.getId()));
+        Department department = departmentRepository.findById(created.getId()).orElseThrow();
 
         Employee employee = Employee.builder()
                 .firstName("John")

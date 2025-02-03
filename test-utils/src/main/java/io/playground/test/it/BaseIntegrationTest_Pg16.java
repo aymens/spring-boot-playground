@@ -1,6 +1,5 @@
 package io.playground.test.it;
 
-import io.playground.test.BaseIntegrationTest;
 import io.playground.test.it.junit.DatabaseExtension_Pg16;
 import org.junit.jupiter.api.extension.ExtendWith;
 

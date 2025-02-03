@@ -1,3 +1,5 @@
+### //next, notes for the pipeline to come, regarding the sba module 
+
 ```bash
 mvn clean package -pl sba -am
 ```
@@ -11,12 +13,14 @@ docker build -t sba -f sba/Dockerfile sba/
 
 sba/: The build context - the directory path sent to Docker daemon as the context for building
 
+### now, during dev
+
 on win:
 ```bash
 docker run -d -p 8081:8081 --name sba sba
 ```
-```bash
 on linux:
+```bash
 docker run --add-host=host.docker.internal:host-gateway -d -p 8081:8081 --name sba sba
 ```
 
@@ -25,8 +29,7 @@ docker exec -it sba sh
 docker logs -f sba
 ```
 
-
-//dep
+### //next, limits to set on sba deployment
 
 resources:
 limits:
