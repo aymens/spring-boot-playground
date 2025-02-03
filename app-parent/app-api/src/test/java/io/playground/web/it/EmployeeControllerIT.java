@@ -18,6 +18,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 
@@ -277,7 +278,7 @@ class EmployeeControllerIT extends BaseMockMvcIntegrationTest_Pg16 {
                 .lastName("Doe")
                 .email("john.doe@example.com")
                 .departmentId(testDepartment.getId())
-                .hireDate(Instant.now().plusSeconds(86400)) // Tomorrow
+                .hireDate(Instant.now().plus(Duration.ofDays(1)))
                 .build();
 
         mockMvc.perform(post(BASE_URL)
