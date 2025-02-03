@@ -140,7 +140,7 @@ public class DataGeneratorController {
         String departmentName;
         do {
             departmentName = faker.commerce().department();
-        } while (departmentRepository.existsByNameAndCompany_Id(departmentName, companyId));
+        } while (departmentRepository.existsByNameIgnoreCaseAndCompany_Id(departmentName, companyId));
 
         return departmentService.create(DepartmentIn.builder()
                 .name(departmentName)

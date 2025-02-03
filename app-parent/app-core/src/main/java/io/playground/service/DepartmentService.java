@@ -5,7 +5,6 @@ import io.playground.model.DepartmentOut;
 import org.springframework.lang.Nullable;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface DepartmentService {
     DepartmentOut create(DepartmentIn department);

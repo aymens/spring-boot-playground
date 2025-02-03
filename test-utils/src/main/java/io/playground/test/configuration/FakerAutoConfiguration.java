@@ -1,11 +1,12 @@
-package io.playground.configuration;
+package io.playground.test.configuration;
 
 import net.datafaker.Faker;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Profile;
 
-@ConditionalOnDataGeneratorEnabled
+@Profile("test")
 @AutoConfiguration
 public class FakerAutoConfiguration {
     @ConditionalOnMissingBean(Faker.class)

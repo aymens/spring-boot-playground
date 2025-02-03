@@ -5,7 +5,7 @@ import io.playground.domain.Department;
 import io.playground.domain.Employee;
 import io.playground.exception.BusinessException;
 import io.playground.exception.NotFoundException;
-import io.playground.it.BaseIntegrationTest_Pg16;
+import io.playground.test.it.BaseIntegrationTest_Pg16;
 import io.playground.model.CompanyIn;
 import io.playground.model.CompanyOut;
 import io.playground.repository.CompanyRepository;
@@ -86,7 +86,7 @@ class CompanyServiceIT extends BaseIntegrationTest_Pg16 {
     }
 
     @Test
-    void getById_WhenExists_ReturnsCompany() {
+    void getById_WhenExists_ReturnsCorrectDto() {
         CompanyIn input = CompanyIn.builder()
                 .name("Test Company")
                 .taxId("1234567890")
@@ -105,7 +105,7 @@ class CompanyServiceIT extends BaseIntegrationTest_Pg16 {
     }
 
     @Test
-    void getById_WhenNotExists_ThrowsException() {
+    void getById_WhenNotExists_ThrowsNotFoundException() {
         // Create and delete a company to get a valid but non-existent ID
         CompanyOut created = companyService.create(CompanyIn.builder()
                 .name("Temporary")

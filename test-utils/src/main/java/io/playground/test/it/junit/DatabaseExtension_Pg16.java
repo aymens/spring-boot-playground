@@ -1,4 +1,4 @@
-package io.playground.it.junit;
+package io.playground.test.it.junit;
 
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
@@ -37,12 +37,17 @@ public class DatabaseExtension_Pg16 implements BeforeAllCallback {
         System.setProperty("spring.datasource.url", POSTGRES.getJdbcUrl());
         System.setProperty("spring.datasource.username", POSTGRES.getUsername());
         System.setProperty("spring.datasource.password", POSTGRES.getPassword());
-        log.info("Updated properties 'spring.datasource.*'.");
+
+        log.info("Set system properties 'spring.datasource.*'.");
+
+        System.getProperties().entrySet().stream()
+                .filter(e -> e.getKey().toString().startsWith("spring.datasource."))
+                .forEach(e -> log.info("{}={}", e.getKey(), e.getValue()));
 
         if (!shutdownHookAdded) {
             Runtime.getRuntime().addShutdownHook(new Thread(POSTGRES::stop));
             shutdownHookAdded = true;
-            log.info("Database shutdown hook has been set.");
+            log.info("Database shutdown hook set.");
         }
     }
 }

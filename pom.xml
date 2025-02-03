@@ -30,7 +30,6 @@
 
         <!-- new -->
         <spring-boot.version>3.3.7</spring-boot.version>
-        <spring-boot-admin.version>3.4.1</spring-boot-admin.version>
         <!--        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>-->
         <!--        <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>-->
         <!--        <maven-surefire-plugin.version>3.2.5</maven-surefire-plugin.version>-->
@@ -129,6 +128,16 @@
             <artifactId>lombok</artifactId>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.14.0</version> <!-- Use the latest version -->
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-collections4</artifactId>
+            <version>4.4</version> <!-- Use the latest version TODO keep?-->
+        </dependency>
 
         <!--        <dependency>-->
         <!--            <groupId>org.springframework.boot</groupId>-->
@@ -152,11 +161,11 @@
             <artifactId>spring-boot-configuration-processor</artifactId>
             <optional>true</optional>
         </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.boot</groupId>-->
+<!--            <artifactId>spring-boot-starter-test</artifactId>-->
+<!--            <scope>test</scope>-->
+<!--        </dependency>-->
         <!-- https://mvnrepository.com/artifact/org.xmlunit/xmlunit-core -->
         <dependency>
             <groupId>org.xmlunit</groupId>

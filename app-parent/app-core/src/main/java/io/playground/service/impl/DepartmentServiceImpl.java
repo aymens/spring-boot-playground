@@ -2,7 +2,6 @@ package io.playground.service.impl;
 
 import io.playground.domain.Company;
 import io.playground.domain.Department;
-import io.playground.domain.Employee;
 import io.playground.exception.BusinessException;
 import io.playground.exception.NotFoundException;
 import io.playground.mapper.DepartmentMapper;
@@ -12,7 +11,6 @@ import io.playground.repository.CompanyRepository;
 import io.playground.repository.DepartmentRepository;
 import io.playground.repository.EmployeeRepository;
 import io.playground.service.DepartmentService;
-import org.springframework.data.domain.Sort;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,9 +40,9 @@ public class DepartmentServiceImpl implements DepartmentService {
     @Override
     public DepartmentOut create(DepartmentIn departmentIn) {
         Company company = companyRepository.findById(departmentIn.getCompanyId())
-                .orElseThrow(() -> new BusinessException("Company not found: " + departmentIn.getCompanyId()));
+                .orElseThrow(() -> NotFoundException.of(Company.class.getName(), departmentIn.getCompanyId()));
 
-        if (departmentRepository.existsByNameAndCompany_Id(
+        if (departmentRepository.existsByNameIgnoreCaseAndCompany_Id(
                 departmentIn.getName(), departmentIn.getCompanyId())) {
             //TODO DEL Sort.sort(Employee.class).by(Employee::getDepartment).ascending();
             throw new BusinessException("Department already exists in company: " + departmentIn.getName());

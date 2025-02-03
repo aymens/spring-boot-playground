@@ -19,6 +19,11 @@ import lombok.val;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.data.jpa.JpaRepositoriesAutoConfiguration;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
+import org.springframework.boot.autoconfigure.liquibase.LiquibaseAutoConfiguration;
+import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.client.TestRestTemplate;
@@ -34,11 +39,20 @@ import java.util.Map;
 import static com.jayway.jsonpath.JsonPath.read;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class GreetingControllerITests {
+@SpringBootTest(
+        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
+        classes = {GreetingController.class, SomeService.class}
+)
+@EnableAutoConfiguration(exclude = {
+        DataSourceAutoConfiguration.class,
+        JpaRepositoriesAutoConfiguration.class,
+        HibernateJpaAutoConfiguration.class,
+        LiquibaseAutoConfiguration.class
+})
+public class GreetingControllerIT {
 
     @Autowired
-    private TestRestTemplate template;
+    TestRestTemplate template;
 
     @MockBean
     SomeService someService;
@@ -52,7 +66,7 @@ public class GreetingControllerITests {
 
         // Validate the response status and body
         assertThat(response.getStatusCode().is2xxSuccessful()).isTrue();
-        assertThat((((String) read(response.getBody(), "$.content"))))
+        assertThat((String) read(response.getBody(), "$.content"))
                 .isEqualTo("Hello, World!");
     }
 
@@ -70,7 +84,7 @@ public class GreetingControllerITests {
 
         // Validate the response status and body
         assertThat(response.getStatusCode().is2xxSuccessful()).isTrue();
-        assertThat((((String) read(response.getBody(), "$.content"))))
+        assertThat((String) read(response.getBody(), "$.content"))
                 .isEqualTo("Hello, Spring Community!");
     }
 
@@ -132,7 +146,7 @@ public class GreetingControllerITests {
         System.out.println("templateUri: "+templateUri);
 
         // Call debug endpoint with both approaches
-        var directResponse = template.getForEntity(directUri, Map.class);
+        val directResponse = template.getForEntity(directUri, Map.class);
         System.out.println("Direct approach debug info:");
         System.out.println(directResponse.getBody());
 

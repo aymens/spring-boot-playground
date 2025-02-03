@@ -6,7 +6,7 @@ public class NotFoundException extends BusinessException {
 
     private static final String namedAndIdentifiedMessageTemplate = "{0}({1}) not found";
 
-    public NotFoundException(String message) {
+    private NotFoundException(String message) {
         super(message);
     }
 

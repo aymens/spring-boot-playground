@@ -1,7 +1,7 @@
 package io.playground.web.it;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.playground.it.BaseMvcIntegrationTest_Pg16;
+import io.playground.test.it.BaseMockMvcIntegrationTest_Pg16;
 import io.playground.domain.Company;
 import io.playground.domain.Department;
 import io.playground.domain.Employee;
@@ -27,7 +27,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @Slf4j
-class CompanyControllerIT extends BaseMvcIntegrationTest_Pg16 {
+class CompanyControllerIT extends BaseMockMvcIntegrationTest_Pg16 {
 
     private static final String BASE_URL = "/api/companies";
 

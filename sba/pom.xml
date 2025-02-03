@@ -11,13 +11,14 @@
     </parent>
 
     <artifactId>sba</artifactId>
-    <version>${spring-boot-admin.version}</version>
+    <!-- spring-boot-admin.version -->
+    <version>3.4.1</version>
 
     <dependencies>
         <dependency>
             <groupId>de.codecentric</groupId>
             <artifactId>spring-boot-admin-starter-server</artifactId>
-            <version>${spring-boot-admin.version}</version>
+            <version>${project.version}</version><!-- spring-boot-admin.version -->
         </dependency>
     </dependencies>
 
