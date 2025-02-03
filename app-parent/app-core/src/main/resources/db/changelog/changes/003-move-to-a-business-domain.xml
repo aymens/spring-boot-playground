@@ -19,23 +19,6 @@
         <dropTable tableName="company" cascadeConstraints="true"/>
     </changeSet>
 
-    <changeSet id="005-create-company" author="aimen.saihi">
-        <createTable tableName="company">
-            <column name="id" type="bigint" autoIncrement="true">
-                <constraints primaryKey="true" nullable="false"/>
-            </column>
-            <column name="name" type="varchar(100)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="tax_id" type="varchar(20)">
-                <constraints nullable="false" unique="true"/>
-            </column>
-            <column name="created_at" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP">
-                <constraints nullable="false"/>
-            </column>
-        </createTable>
-    </changeSet>
-
     <changeSet id="004-03-drop-existing-tables" author="aimen.saihi">
         <preConditions onFail="MARK_RAN">
             <tableExists tableName="department" />
@@ -43,52 +26,11 @@
         <dropTable tableName="department" cascadeConstraints="true"/>
     </changeSet>
 
-    <changeSet id="006-create-department" author="aimen.saihi">
-        <createTable tableName="department">
-            <column name="id" type="bigint" autoIncrement="true">
-                <constraints primaryKey="true" nullable="false"/>
-            </column>
-            <column name="name" type="varchar(50)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="company_id" type="bigint">
-                <constraints nullable="false"
-                             foreignKeyName="fk_department_company"
-                             references="company(id)"/>
-            </column>
-        </createTable>
-    </changeSet>
-
     <changeSet id="004-04-drop-existing-tables" author="aimen.saihi">
         <preConditions onFail="MARK_RAN">
             <tableExists tableName="employee" />
         </preConditions>
         <dropTable tableName="employee" cascadeConstraints="true"/>
-    </changeSet>
-
-    <changeSet id="007-create-employee" author="aimen.saihi">
-        <createTable tableName="employee">
-            <column name="id" type="bigint" autoIncrement="true">
-                <constraints primaryKey="true" nullable="false"/>
-            </column>
-            <column name="first_name" type="varchar(50)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="last_name" type="varchar(50)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="email" type="varchar(100)">
-                <constraints nullable="false" unique="true"/>
-            </column>
-            <column name="department_id" type="bigint">
-                <constraints nullable="false"
-                             foreignKeyName="fk_employee_department"
-                             references="department(id)"/>
-            </column>
-            <column name="hire_date" type="date">
-                <constraints nullable="false"/>
-            </column>
-        </createTable>
     </changeSet>
 
     <changeSet id="004-05-drop-existing-indexes" author="aimen.saihi">
@@ -112,6 +54,65 @@
         <dropIndex indexName="idx_employee_email" tableName="employee"/>
     </changeSet>
 
+    <changeSet id="005-create-company" author="aimen.saihi">
+        <createTable tableName="company">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="varchar(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="tax_id" type="varchar(20)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="created_at" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="006-create-department" author="aimen.saihi">
+        <createTable tableName="department">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="company_id" type="bigint">
+                <constraints nullable="false"
+                foreignKeyName="fk_department_company"
+                references="company(id)"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+
+    <changeSet id="007-create-employee" author="aimen.saihi">
+        <createTable tableName="employee">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="first_name" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_name" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="email" type="varchar(100)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="department_id" type="bigint">
+                <constraints nullable="false"
+                foreignKeyName="fk_employee_department"
+                references="department(id)"/>
+            </column>
+            <column name="hire_date" type="date">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
     <changeSet id="008-create-indexes" author="aimen.saihi">
         <createIndex indexName="idx_employee_email" tableName="employee">
             <column name="email"/>
@@ -123,4 +124,5 @@
             <column name="company_id"/>
         </createIndex>
     </changeSet>
+
 </databaseChangeLog>

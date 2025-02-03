@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="001-department-functional-index" author="aimen.saihi">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <or>
+                    <dbms type="mssql"/>
+                    <dbms type="db2"/>
+                    <dbms type="sybase"/>
+                    <!-- Add any other unsupported DBMS types here -->
+                </or>
+            </not>
+        </preConditions>
+        <!--        didn't work on pg, idx created hadn't upper(name) value, thus the move to raw sql option below -->
+        <!--        <createIndex indexName="idx_department_name_upper" tableName="department">-->
+        <!--            <column name="name" type="function" value="UPPER(name)"/>-->
+        <!--        </createIndex>-->
+        <sql>
+            CREATE INDEX idx_department_name_upper ON department USING btree (UPPER(name));
+        </sql>
+    </changeSet>
+
+    <changeSet id="002-company-additional-index" author="aimen.saihi">
+        <createIndex indexName="idx_company_tax_id" tableName="company">
+            <column name="tax_id"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

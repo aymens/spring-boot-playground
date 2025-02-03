@@ -8,5 +8,6 @@
     <include file="db/changelog/changes/001-initial-schema.xml"/>
     <include file="db/changelog/changes/002-add-description.xml"/>
     <include file="db/changelog/changes/003-move-to-a-business-domain.xml"/>
+    <include file="db/changelog/changes/004-add-indexes.xml"/>
 
 </databaseChangeLog>
