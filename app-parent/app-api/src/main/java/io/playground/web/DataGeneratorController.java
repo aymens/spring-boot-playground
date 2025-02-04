@@ -4,6 +4,7 @@ import io.playground.configuration.ConditionalOnDataGeneratorEnabled;
 import io.playground.domain.Company;
 import io.playground.domain.Department;
 import io.playground.exception.InvalidIdRangeException;
+import io.playground.helper.FakerHelper;
 import io.playground.model.CompanyIn;
 import io.playground.model.DepartmentIn;
 import io.playground.model.DepartmentOut;
@@ -54,6 +55,7 @@ public class DataGeneratorController {
     private final DepartmentRepository departmentRepository;
     private final EmployeeRepository employeeRepository;
     private final Faker faker;
+    private final FakerHelper fakerHelper;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -153,10 +155,11 @@ public class DataGeneratorController {
                 .forEach(_ -> {
                     val firstName = faker.name().firstName();
                     val lastName = faker.name().lastName();
+                    val email = fakerHelper.generateEmail(firstName, lastName, employeeRepository::existsByEmail);
                     EmployeeIn employee = EmployeeIn.builder()
                             .firstName(firstName)
                             .lastName(lastName)
-                            .email(generateEmail(firstName, lastName))
+                            .email(email)
                             .departmentId(departmentId)
                             .hireDate(generateRandomPastDate())
                             .build();
@@ -171,18 +174,6 @@ public class DataGeneratorController {
             taxId = faker.numerify("##########");
         } while (companyRepository.existsByTaxId(taxId));
         return taxId;
-    }
-
-    private String generateEmail(String firstName, String lastName) {
-        val localPart = String
-                .join(".", firstName.toLowerCase(), lastName.toLowerCase())
-                .replaceAll("[^a-z0-9.]", "");
-        var email = faker.internet().emailAddress(localPart);
-        while (employeeRepository.existsByEmail(email)) {
-            log.warn("Email already exists: {}", email);
-            email = faker.internet().emailAddress(localPart + "." + faker.number().digits(3));
-        }
-        return email;
     }
 
     private Instant generateRandomPastDate() {
