@@ -24,7 +24,7 @@ class CompanyServiceIT extends BaseServiceIntegrationTest {
     @Autowired
     private CompanyService companyService;
 
-    CompanyIn createValidCompanyInput() {
+    private CompanyIn createValidCompanyInput() {
         return CompanyIn.builder()
                 .name(faker.company().name())
                 .taxId(faker.numerify("##########"))
