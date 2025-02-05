@@ -1,5 +1,6 @@
 package io.playground.helper;
 
+import io.playground.exception.BusinessException;
 import io.playground.test.configuration.TestUtilsAutoConfiguration;
 import lombok.val;
 import org.junit.jupiter.api.Test;
@@ -13,6 +14,7 @@ import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @SpringBootTest(classes = {FakerHelper.class, TestUtilsAutoConfiguration.class})
 class FakerHelperTest {
@@ -25,7 +27,6 @@ class FakerHelperTest {
     @Test
     void generateEmail_WithNames_ReturnsValidEmail() {
         val email = fakerHelper.generateEmail("John", "Doe", _ -> false);
-
         assertThat(email)
                 .matches(EMAIL_PATTERN)
                 .startsWith("john.doe");
@@ -95,5 +96,18 @@ class FakerHelperTest {
                 .allSatisfy(attempt -> assertThat(attempt).matches(EMAIL_PATTERN))
                 .allMatch(attempt -> attempt.startsWith("john.doe"))
                 .contains(email);  // Final result should be in attempts
+    }
+
+    @Test
+    void generateEmail_WhenMaxAttemptsIsReached_ThrowsException() {
+        assertThatThrownBy(
+                () -> fakerHelper.generateEmail(
+                        "john",
+                        "doe",
+                        _ -> true  /*Force infinite attempts*/
+                )
+        )
+                .isInstanceOf(BusinessException.class)
+                .hasMessageContaining("Couldn't generate a valid unique email for john.doe under 10 max attempts");
     }
 }
