@@ -31,6 +31,7 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.IntStream;
 import java.util.stream.LongStream;
@@ -155,7 +156,7 @@ public class DataGeneratorController {
                 .forEach(_ -> {
                     val firstName = faker.name().firstName();
                     val lastName = faker.name().lastName();
-                    val email = fakerHelper.generateEmail(firstName, lastName, employeeRepository::existsByEmail);
+                    val email = fakerHelper.generateEmail(firstName, lastName, Predicate.not(employeeRepository::existsByEmail));
                     EmployeeIn employee = EmployeeIn.builder()
                             .firstName(firstName)
                             .lastName(lastName)

@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
+import static io.playground.helper.FakerHelper.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -26,7 +27,7 @@ class FakerHelperTest {
 
     @Test
     void generateEmail_WithNames_ReturnsValidEmail() {
-        val email = fakerHelper.generateEmail("John", "Doe", _ -> false);
+        val email = fakerHelper.generateEmail("John", "Doe", ANY);
         assertThat(email)
                 .matches(EMAIL_PATTERN)
                 .startsWith("john.doe");
@@ -34,7 +35,7 @@ class FakerHelperTest {
 
     @Test
     void generateEmail_WithSpecialChars_ReturnsCleanEmail() {
-        val email = fakerHelper.generateEmail("John-Paul", "O'Doe", _ -> false);
+        val email = fakerHelper.generateEmail("John-Paul", "O'Doe", ANY);
 
         assertThat(email)
                 .matches(EMAIL_PATTERN)
@@ -43,9 +44,8 @@ class FakerHelperTest {
 
     @Test
     void generateEmail_WhenDuplicate_AddsNumericSuffix() {
-        val email1 = fakerHelper.generateEmail("john", "doe", _ -> false);
-        val email2 = fakerHelper.generateEmail("john", "doe", s -> s.startsWith("john.doe@"));
-
+        val email1 = fakerHelper.generateEmail("john", "doe", ANY);
+        val email2 = fakerHelper.generateEmail("john", "doe", STARTS_WITH.apply("john.doe@").negate());
         assertThat(email1)
                 .matches(EMAIL_PATTERN)
                 .startsWith("john.doe@")
@@ -58,17 +58,19 @@ class FakerHelperTest {
     @Test
     void generateEmail_WhenMultipleDuplicates_IncrementsUntilUnique() {
         val usedEmails = new HashSet<String>();
-        val email1 = fakerHelper.generateEmail("john", "doe", _ -> false);
+        val email1 = fakerHelper.generateEmail("john", "doe", ANY);
         usedEmails.add(email1);
-        val email2 = fakerHelper.generateEmail("john", "doe", s -> s.startsWith("john.doe@"));
+        val email2 = fakerHelper.generateEmail("john", "doe", STARTS_WITH.apply("john.doe."));
         usedEmails.add(email2);
-        Predicate<String> lessThanOneCollision = _ -> usedEmails.stream().filter(s1 -> s1.startsWith("john.doe.")).count() <= 1;
+        Predicate<String> thereIsLessThanOneCollision = _ ->
+                usedEmails.stream().filter(STARTS_WITH.apply("john.doe.")).count() <= 1;
+        Predicate<String> thereIsMoreThanOneCollision = thereIsLessThanOneCollision.negate();
         var email3 = "";
-        while (lessThanOneCollision.test("")) {
+        while (thereIsLessThanOneCollision.test(null)) {
             email3 = fakerHelper.generateEmail(
                     "john",
                     "doe",
-                    lessThanOneCollision,
+                    thereIsMoreThanOneCollision,
                     usedEmails::add
             );
             usedEmails.add(email3);
@@ -76,9 +78,8 @@ class FakerHelperTest {
 
         assertThat(email3)
                 .matches(EMAIL_PATTERN)
-                .isNotEqualTo(email1)
-                .isNotEqualTo(email2)
-                .startsWith("john.doe.");
+                .startsWith("john.doe.")
+                .isNotIn(email1, email2);
     }
 
     @Test
@@ -87,7 +88,7 @@ class FakerHelperTest {
         val email = fakerHelper.generateEmail(
                 "john",
                 "doe",
-                _ -> attempts.size() < 3,  // Force 3 attempts
+                _ -> attempts.size() >= 3,  // Force 3 attempts
                 attempts::add
         );
 
@@ -104,7 +105,7 @@ class FakerHelperTest {
                 () -> fakerHelper.generateEmail(
                         "john",
                         "doe",
-                        _ -> true  /*Force infinite attempts*/
+                        NONE  /*Force infinite attempts*/
                 )
         )
                 .isInstanceOf(BusinessException.class)
