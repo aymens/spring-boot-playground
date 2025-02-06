@@ -270,7 +270,7 @@
                         <!--                    <compilerArgs>-->
                         <!--                        &#45;&#45;enable-preview-->
                         <!--                    </compilerArgs>-->
-                        <annotationProcessorPaths>
+                        <annotationProcessorPaths combine.children="append">
                             <path>
                                 <groupId>org.mapstruct</groupId>
                                 <artifactId>mapstruct-processor</artifactId>
@@ -285,6 +285,11 @@
                                 <groupId>org.projectlombok</groupId>
                                 <artifactId>lombok-mapstruct-binding</artifactId>
                                 <version>0.2.0</version>
+                            </path>
+                            <path>
+                                <groupId>org.hibernate.orm</groupId>
+                                <artifactId>hibernate-jpamodelgen</artifactId>
+                                <version>${hibernate.version}</version>
                             </path>
                             <path>
                                 <groupId>org.springframework.boot</groupId>

@@ -10,16 +10,14 @@ import io.playground.repository.CompanyRepository;
 import io.playground.service.CompanyService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Slf4j
 @Service
-@Transactional
 public class CompanyServiceImpl implements CompanyService {
-
+//TODO factorisable common methods, using +getRepository() +getMapper()
     private final CompanyRepository companyRepository;
     private final CompanyMapper companyMapper;
 
@@ -41,7 +39,6 @@ public class CompanyServiceImpl implements CompanyService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public CompanyOut getById(Long id) {
         return companyRepository.findById(id)
                 .map(companyMapper::map)
@@ -49,7 +46,6 @@ public class CompanyServiceImpl implements CompanyService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<CompanyOut> getAll() {
         return companyRepository.findAll().stream()
                 .map(companyMapper::map)
@@ -78,7 +74,6 @@ public class CompanyServiceImpl implements CompanyService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public boolean exists(Long id) {
         return companyRepository.existsById(id);
     }

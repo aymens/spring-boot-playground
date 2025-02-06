@@ -11,15 +11,18 @@ import io.playground.repository.CompanyRepository;
 import io.playground.repository.DepartmentRepository;
 import io.playground.repository.EmployeeRepository;
 import io.playground.service.DepartmentService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static io.playground.repository.spec.DepartmentSpecs.*;
+
 @Service
-@Transactional
 public class DepartmentServiceImpl implements DepartmentService {
 
     private final DepartmentRepository departmentRepository;
@@ -54,7 +57,6 @@ public class DepartmentServiceImpl implements DepartmentService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public DepartmentOut getById(Long id) {
         return departmentRepository.findById(id)
                 .map(departmentMapper::map)
@@ -62,7 +64,6 @@ public class DepartmentServiceImpl implements DepartmentService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<DepartmentOut> getByCompanyId(Long companyId) {
         if (!companyRepository.existsById(companyId)) {
             throw NotFoundException.of(Company.class.getName(), companyId);
@@ -108,8 +109,24 @@ public class DepartmentServiceImpl implements DepartmentService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public boolean exists(Long id) {
         return departmentRepository.existsById(id);
+    }
+
+
+    @Override
+    public Page<DepartmentOut> find(
+            Long companyId,
+            String nameFilter,
+            Integer minEmployees,
+            Pageable pageable
+    ) {
+        Specification<Department> spec =
+                Specification.where(hasCompanyId(companyId))
+                        .and(nameContains(nameFilter))
+                        .and(hasMinEmployees(minEmployees));
+
+        return departmentRepository.findAll(spec, pageable)
+                .map(departmentMapper::map);
     }
 }

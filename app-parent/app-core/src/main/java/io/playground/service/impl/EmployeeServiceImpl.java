@@ -11,13 +11,11 @@ import io.playground.repository.DepartmentRepository;
 import io.playground.repository.EmployeeRepository;
 import io.playground.service.EmployeeService;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-@Transactional
 public class EmployeeServiceImpl implements EmployeeService {
 
     private final EmployeeRepository employeeRepository;
@@ -47,7 +45,6 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public EmployeeOut getById(Long id) {
         return employeeRepository.findById(id)
                 .map(employeeMapper::map)
@@ -55,7 +52,6 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<EmployeeOut> getByDepartmentId(Long departmentId) {
         if (!departmentRepository.existsById(departmentId)) {
             throw new BusinessException("Department not found: " + departmentId);
@@ -74,7 +70,6 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public boolean exists(Long id) {
         return employeeRepository.existsById(id);
     }

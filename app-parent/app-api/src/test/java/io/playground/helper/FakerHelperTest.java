@@ -62,8 +62,7 @@ class FakerHelperTest {
         usedEmails.add(email1);
         val email2 = fakerHelper.generateEmail("john", "doe", STARTS_WITH.apply("john.doe."));
         usedEmails.add(email2);
-        Predicate<String> thereIsLessThanOneCollision = _ ->
-                usedEmails.stream().filter(STARTS_WITH.apply("john.doe.")).count() <= 1;
+        Predicate<String> thereIsLessThanOneCollision = _ -> usedEmails.stream().filter(STARTS_WITH.apply("john.doe.")).count() <= 1;
         Predicate<String> thereIsMoreThanOneCollision = thereIsLessThanOneCollision.negate();
         var email3 = "";
         while (thereIsLessThanOneCollision.test(null)) {

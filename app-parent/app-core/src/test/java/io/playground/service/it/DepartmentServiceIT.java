@@ -12,8 +12,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
+import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -190,6 +194,83 @@ class DepartmentServiceIT extends BaseServiceIntegrationTest {
         void getByCompanyId_WithoutDepartments_ReturnsEmptyList() {
             List<DepartmentOut> results = departmentService.getByCompanyId(testCompany.getId());
             assertThat(results).isEmpty();
+        }
+
+        @Test
+        void find_WithAllFilters_ReturnsMatchingDepartments() {
+            // given
+            Department department1 = createTestDepartment(testCompany);
+            IntStream.range(0, 5).forEach(_ -> createTestEmployee(department1));
+
+            Department department2 = createTestDepartment(testCompany);
+            IntStream.range(0, 3).forEach(_ -> createTestEmployee(department2));
+
+            departmentRepository.save(
+                    department2.toBuilder()
+                            .name(department2.getName().concat(department1.getName()))
+                            .build()
+            );
+
+            Pageable pageable = PageRequest.of(0, 10);
+
+            // when
+            Page<DepartmentOut> result = departmentService.find(
+                    testCompany.getId(),
+                    department1.getName().substring(0, 3),
+                    4,
+                    pageable
+            );
+
+            // then
+            assertThat(result)
+                    .hasSize(1)
+                    .first()
+
+                    // Version 1: Using satisfies
+                    .satisfies(dept -> {
+                        assertThat(dept.getName()).isEqualTo(department1.getName());
+                        assertThat(dept.getCompanyId()).isEqualTo(testCompany.getId());
+                    })
+
+                    // Version 2: Using returns/isEqualTo chaining
+                    .returns(department1.getName(), DepartmentOut::getName)
+                    .returns(testCompany.getId(), DepartmentOut::getCompanyId)
+
+                    // Version 3: Using extracting with tuple
+                    .extracting(DepartmentOut::getName, DepartmentOut::getCompanyId)
+                    .containsExactly(department1.getName(), testCompany.getId());
+        }
+
+        @Test
+        void find_WithNoFilters_ReturnsAllDepartments() {
+            // given
+            Department department1 = createTestDepartment(testCompany);
+            IntStream.range(0, 5).forEach(_ -> createTestEmployee(department1));
+
+            Department department2 = createTestDepartment(testCompany);
+            IntStream.range(0, 2).forEach(_ -> createTestEmployee(department2));
+
+            Department department3 = createTestDepartment(testCompany);
+            IntStream.range(0, 3).forEach(_ -> createTestEmployee(department3));
+
+            Pageable pageable = PageRequest.of(0, 10);
+
+            // when
+            Page<DepartmentOut> result = departmentService.find(
+                    null,
+                    null,
+                    null,
+                    pageable
+            );
+
+            // then
+            assertThat(result)
+                    .hasSize(3)
+                    .extracting(DepartmentOut::getName)
+                    .containsExactlyInAnyOrder(
+                            department1.getName(),
+                            department2.getName(),
+                            department3.getName());
         }
     }
 

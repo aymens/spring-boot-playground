@@ -13,7 +13,7 @@ import java.util.List;
 @Setter
 @ToString
 @EqualsAndHashCode
-@Builder
+@Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
 public class Department {
