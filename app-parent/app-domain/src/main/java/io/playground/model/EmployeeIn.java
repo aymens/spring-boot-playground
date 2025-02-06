@@ -12,7 +12,7 @@ import java.time.Instant;
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
-public class EmployeeIn {
+public class EmployeeIn implements Dto {
     @NotBlank(message = "First name is required")
     @Size(max = 50)
     private String firstName;

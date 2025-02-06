@@ -205,9 +205,11 @@ class DepartmentServiceIT extends BaseServiceIntegrationTest {
             Department department2 = createTestDepartment(testCompany);
             IntStream.range(0, 3).forEach(_ -> createTestEmployee(department2));
 
+            String nextName = department2.getName().concat(department1.getName());
+            nextName = nextName.substring(0, Math.min(nextName.length(), 50));
             departmentRepository.save(
                     department2.toBuilder()
-                            .name(department2.getName().concat(department1.getName()))
+                            .name(nextName)
                             .build()
             );
 

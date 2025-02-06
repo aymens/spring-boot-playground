@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
-public class CompanyIn {
+public class CompanyIn implements Dto {
     @NotBlank(message = "Company name is required")
     @Size(max = 100, message = "Company name cannot exceed 100 characters")
     private String name;

@@ -16,7 +16,7 @@ import java.util.List;
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
-public class Department {
+public class Department implements Domain {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

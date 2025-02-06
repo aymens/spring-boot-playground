@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class DepartmentOut {
+public class DepartmentOut implements Dto {
     private Long id;
     private String name;
     private Long companyId;

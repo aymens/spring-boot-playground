@@ -5,39 +5,46 @@ import io.playground.domain.Department;
 import io.playground.exception.BusinessException;
 import io.playground.exception.NotFoundException;
 import io.playground.mapper.DepartmentMapper;
+import io.playground.mapper.Mapper;
 import io.playground.model.DepartmentIn;
 import io.playground.model.DepartmentOut;
 import io.playground.repository.CompanyRepository;
 import io.playground.repository.DepartmentRepository;
 import io.playground.repository.EmployeeRepository;
 import io.playground.service.DepartmentService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 import static io.playground.repository.spec.DepartmentSpecs.*;
 
+@Transactional
 @Service
-public class DepartmentServiceImpl implements DepartmentService {
+@RequiredArgsConstructor
+public class DepartmentServiceImpl extends BaseDomainServiceImpl<Department, Long, DepartmentIn, DepartmentOut>
+        implements DepartmentService {
 
     private final DepartmentRepository departmentRepository;
     private final CompanyRepository companyRepository;
     private final DepartmentMapper departmentMapper;
     private final EmployeeRepository employeeRepository;
 
-    public DepartmentServiceImpl(DepartmentRepository departmentRepository,
-                                 CompanyRepository companyRepository,
-                                 DepartmentMapper departmentMapper,
-                                 EmployeeRepository employeeRepository) {
-        this.departmentRepository = departmentRepository;
-        this.companyRepository = companyRepository;
-        this.departmentMapper = departmentMapper;
-        this.employeeRepository = employeeRepository;
+    @Override
+    public JpaRepository<Department, Long> getRepository() {
+        return departmentRepository;
+    }
+
+    @Override
+    public Mapper<Department, DepartmentIn, DepartmentOut> getMapper() {
+        return departmentMapper;
     }
 
     @Override
@@ -56,13 +63,7 @@ public class DepartmentServiceImpl implements DepartmentService {
         return departmentMapper.map(department);
     }
 
-    @Override
-    public DepartmentOut getById(Long id) {
-        return departmentRepository.findById(id)
-                .map(departmentMapper::map)
-                .orElseThrow(() -> NotFoundException.of(Department.class.getName(), id));
-    }
-
+    @Transactional(readOnly = true)
     @Override
     public List<DepartmentOut> getByCompanyId(Long companyId) {
         if (!companyRepository.existsById(companyId)) {
@@ -104,16 +105,10 @@ public class DepartmentServiceImpl implements DepartmentService {
             department.getEmployees().clear();
             departmentRepository.save(department);
         }
-
         departmentRepository.deleteById(id);
     }
 
-    @Override
-    public boolean exists(Long id) {
-        return departmentRepository.existsById(id);
-    }
-
-
+    @Transactional(readOnly = true)
     @Override
     public Page<DepartmentOut> find(
             Long companyId,

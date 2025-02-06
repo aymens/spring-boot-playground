@@ -5,29 +5,37 @@ import io.playground.domain.Employee;
 import io.playground.exception.BusinessException;
 import io.playground.exception.NotFoundException;
 import io.playground.mapper.EmployeeMapper;
+import io.playground.mapper.Mapper;
 import io.playground.model.EmployeeIn;
 import io.playground.model.EmployeeOut;
 import io.playground.repository.DepartmentRepository;
 import io.playground.repository.EmployeeRepository;
 import io.playground.service.EmployeeService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Transactional
 @Service
-public class EmployeeServiceImpl implements EmployeeService {
+@RequiredArgsConstructor
+public class EmployeeServiceImpl extends BaseDomainServiceImpl<Employee, Long, EmployeeIn, EmployeeOut> implements EmployeeService {
 
     private final EmployeeRepository employeeRepository;
     private final DepartmentRepository departmentRepository;
     private final EmployeeMapper employeeMapper;
 
-    public EmployeeServiceImpl(EmployeeRepository employeeRepository,
-                               DepartmentRepository departmentRepository,
-                               EmployeeMapper employeeMapper) {
-        this.employeeRepository = employeeRepository;
-        this.departmentRepository = departmentRepository;
-        this.employeeMapper = employeeMapper;
+    @Override
+    public JpaRepository<Employee, Long> getRepository() {
+        return employeeRepository;
+    }
+
+    @Override
+    public Mapper<Employee, EmployeeIn, EmployeeOut> getMapper() {
+        return employeeMapper;
     }
 
     @Override
@@ -44,13 +52,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         return employeeMapper.map(employee);
     }
 
-    @Override
-    public EmployeeOut getById(Long id) {
-        return employeeRepository.findById(id)
-                .map(employeeMapper::map)
-                .orElseThrow(() -> NotFoundException.of(Employee.class.getName(), id));
-    }
-
+    @Transactional(readOnly = true)
     @Override
     public List<EmployeeOut> getByDepartmentId(Long departmentId) {
         if (!departmentRepository.existsById(departmentId)) {
@@ -59,18 +61,5 @@ public class EmployeeServiceImpl implements EmployeeService {
         return employeeRepository.findByDepartmentId(departmentId).stream()
                 .map(employeeMapper::map)
                 .collect(Collectors.toList());
-    }
-
-    @Override
-    public void delete(Long id) {
-        if (!employeeRepository.existsById(id)) {
-            throw NotFoundException.of(Employee.class.getName(), id);
-        }
-        employeeRepository.deleteById(id);
-    }
-
-    @Override
-    public boolean exists(Long id) {
-        return employeeRepository.existsById(id);
     }
 }

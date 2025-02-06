@@ -15,7 +15,7 @@ import java.time.Instant;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Employee {
+public class Employee implements Domain {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

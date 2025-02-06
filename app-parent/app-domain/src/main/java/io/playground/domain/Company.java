@@ -17,7 +17,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 //TODO Map relationship
-public class Company {
+public class Company implements Domain {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

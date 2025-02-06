@@ -4,27 +4,33 @@ import io.playground.domain.Company;
 import io.playground.exception.BusinessException;
 import io.playground.exception.NotFoundException;
 import io.playground.mapper.CompanyMapper;
+import io.playground.mapper.Mapper;
 import io.playground.model.CompanyIn;
 import io.playground.model.CompanyOut;
 import io.playground.repository.CompanyRepository;
 import io.playground.service.CompanyService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.stream.Collectors;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
+@Transactional
 @Service
-public class CompanyServiceImpl implements CompanyService {
-//TODO factorisable common methods, using +getRepository() +getMapper()
+@RequiredArgsConstructor
+public class CompanyServiceImpl extends BaseDomainServiceImpl<Company, Long, CompanyIn, CompanyOut> implements CompanyService {
     private final CompanyRepository companyRepository;
     private final CompanyMapper companyMapper;
 
-    public CompanyServiceImpl(CompanyRepository companyRepository,
-                              CompanyMapper companyMapper) {
-        this.companyRepository = companyRepository;
-        this.companyMapper = companyMapper;
+    @Override
+    public JpaRepository<Company, Long> getRepository() {
+        return companyRepository;
+    }
+
+    @Override
+    public Mapper<Company, CompanyIn, CompanyOut> getMapper() {
+        return companyMapper;
     }
 
     @Override
@@ -36,20 +42,6 @@ public class CompanyServiceImpl implements CompanyService {
         Company company = companyMapper.map(companyIn);
         company = companyRepository.save(company);
         return companyMapper.map(company);
-    }
-
-    @Override
-    public CompanyOut getById(Long id) {
-        return companyRepository.findById(id)
-                .map(companyMapper::map)
-                .orElseThrow(() -> NotFoundException.of(Company.class.getName(), id));
-    }
-
-    @Override
-    public List<CompanyOut> getAll() {
-        return companyRepository.findAll().stream()
-                .map(companyMapper::map)
-                .collect(Collectors.toList());
     }
 
     @Override
@@ -71,10 +63,5 @@ public class CompanyServiceImpl implements CompanyService {
         log.info("Deleting company: {} ({})", company.getName(), id);
         companyRepository.deleteById(id);
         log.debug("Company deleted successfully: {}", id);
-    }
-
-    @Override
-    public boolean exists(Long id) {
-        return companyRepository.existsById(id);
     }
 }

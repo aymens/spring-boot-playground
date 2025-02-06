@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class DepartmentIn {
+public class DepartmentIn implements Dto {
     @NotBlank(message = "Department name is required")
     @Size(max = 50, message = "Department name cannot exceed 50 characters")
     private String name;

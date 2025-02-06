@@ -11,7 +11,7 @@ import org.mapstruct.MappingTarget;
 import static org.mapstruct.MappingConstants.ComponentModel.SPRING;
 
 @Mapper(componentModel = SPRING/*, nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS*/)
-public interface EmployeeMapper {//TODO test
+public interface EmployeeMapper extends io.playground.mapper.Mapper<Employee, EmployeeIn, EmployeeOut> {
 
     @Mapping(target = "departmentId", source = "department.id")
     EmployeeOut map(Employee employee);

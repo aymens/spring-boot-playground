@@ -11,7 +11,7 @@ import java.time.Instant;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class EmployeeOut {
+public class EmployeeOut implements Dto {
     private Long id;
     private String firstName;
     private String lastName;
