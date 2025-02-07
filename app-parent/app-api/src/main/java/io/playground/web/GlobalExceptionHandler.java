@@ -2,6 +2,7 @@ package io.playground.web;
 
 import io.playground.exception.BusinessException;
 import io.playground.exception.NotFoundException;
+import org.springframework.data.mapping.PropertyReferenceException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -10,9 +11,11 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static org.springframework.http.ResponseEntity.*;
+import static org.springframework.http.ResponseEntity.badRequest;
+import static org.springframework.http.ResponseEntity.status;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -33,10 +36,20 @@ public class GlobalExceptionHandler {
                 e.getBindingResult().getFieldErrors().stream()
                         .collect(Collectors.toMap(
                                 FieldError::getField,
-                                FieldError::getDefaultMessage)));
+                                this::fieldErrorMessageExtractor)));
+
 //        Map<String, String> errors = new HashMap<>();
 //        e.getBindingResult().getFieldErrors()
 //                .forEach(error -> errors.put(error.getField(), error.getDefaultMessage()));
 //        return ResponseEntity.badRequest().body(errors);
+    }
+
+    @ExceptionHandler(PropertyReferenceException.class)
+    public ResponseEntity<Map<String, String>> handlePropertyReferenceException(PropertyReferenceException e) {
+        return badRequest().body(Map.of(e.getPropertyName(), e.getMessage()));
+    }
+
+    private String fieldErrorMessageExtractor(FieldError fieldError) {
+        return Optional.ofNullable(fieldError.getDefaultMessage()).orElse("");
     }
 }
