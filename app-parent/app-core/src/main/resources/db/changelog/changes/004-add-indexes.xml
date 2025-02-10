@@ -5,27 +5,57 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
                         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
 
-    <changeSet id="001-department-functional-index" author="aimen.saihi">
-        <preConditions onFail="MARK_RAN">
-            <not>
-                <or>
-                    <dbms type="mssql"/>
-                    <dbms type="db2"/>
-                    <dbms type="sybase"/>
-                    <!-- Add any other unsupported DBMS types here -->
-                </or>
-            </not>
+    <changeSet id="004.001-drop-if-exists" author="aimen.saihi">
+        <preConditions>
+            <indexExists tableName="department" indexName="idx_department_name_upper"/>
         </preConditions>
+        <dropIndex tableName="department" indexName="idx_department_name_upper"/>
+    </changeSet>
+
+    <changeSet id="004.002-department-functional-index" author="aimen.saihi">
+        <preConditions onFail="MARK_RAN">
+            <or>
+                <dbms type="postgresql"/>
+                <dbms type="oracle"/>
+                <dbms type="mysql"/>
+                <dbms type="mariadb"/>
+                <dbms type="h2"/>
+            </or>
+        </preConditions>
+
         <!--        didn't work on pg, idx created hadn't upper(name) value, thus the move to raw sql option below -->
         <!--        <createIndex indexName="idx_department_name_upper" tableName="department">-->
         <!--            <column name="name" type="function" value="UPPER(name)"/>-->
         <!--        </createIndex>-->
-        <sql>
+        <!-- PostgreSQL -->
+        <sql dbms="postgresql">
             CREATE INDEX idx_department_name_upper ON department USING btree (UPPER(name));
+        </sql>
+
+        <!-- Oracle -->
+        <sql dbms="oracle">
+            CREATE INDEX idx_department_name_upper ON department (UPPER(name));
+        </sql>
+
+        <!-- MySQL 8.0+ and MariaDB 10.5+ -->
+        <sql dbms="mysql,mariadb">
+            ALTER TABLE department ADD INDEX idx_department_name_upper ((UPPER(name)));
+        </sql>
+
+        <!-- H2 Database -->
+        <sql dbms="h2">
+            CREATE INDEX idx_department_name_upper ON department (UPPER(name));
         </sql>
     </changeSet>
 
-    <changeSet id="002-company-additional-index" author="aimen.saihi">
+    <changeSet id="004.003-drop-if-exists" author="aimen.saihi">
+        <preConditions>
+            <indexExists tableName="company" indexName="idx_company_tax_id"/>
+        </preConditions>
+        <dropIndex tableName="company" indexName="idx_company_tax_id"/>
+    </changeSet>
+
+    <changeSet id="004.004-010-company-additional-index" author="aimen.saihi">
         <createIndex indexName="idx_company_tax_id" tableName="company">
             <column name="tax_id"/>
         </createIndex>

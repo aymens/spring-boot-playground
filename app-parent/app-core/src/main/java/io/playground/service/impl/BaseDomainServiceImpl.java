@@ -4,6 +4,7 @@ import io.playground.domain.Domain;
 import io.playground.exception.NotFoundException;
 import io.playground.model.Dto;
 import io.playground.service.DomainService;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.reflect.ParameterizedType;
@@ -11,17 +12,20 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Abstract base implementation of the {@link DomainService} interface, providing generic operations
- * for managing and interacting with domain entities and their Data Transfer Objects (DTOs).
+ * Provides a base implementation of the {@link DomainService} interface.
+ * This abstract class defines generic CRUD operations and other utility methods
+ * for working with domain entities and their associated data transfer objects (DTOs).
  *
- * @param <Ety>  The type of domain entity managed by the service, extending the {@link Domain} interface.
- * @param <ID> The type of the identifier used by the domain entity.
- * @param <InDto>  The input DTO type used for creating or updating the domain entity.
- * @param <OutDto>  The output DTO type used for retrieving domain entity information.
+ * @param <Ety>   The type of the domain entity that extends the {@link Domain} interface.
+ * @param <ID>    The type of the identifier of the domain entity.
+ * @param <REPO>  The type of the repository that extends JpaRepository for managing the domain entity.
+ * @param <InDto> The type of the input DTO used for creating/updating domain entities.
+ * @param <OutDto> The type of the output DTO used for retrieving domain entity details.
  */
 @Transactional
-public abstract class BaseDomainServiceImpl<Ety extends Domain, ID, InDto extends Dto, OutDto extends Dto>
-        implements DomainService<Ety, ID, InDto, OutDto> {
+public abstract class BaseDomainServiceImpl<Ety extends Domain, ID, REPO extends JpaRepository<Ety, ID>,
+        InDto extends Dto, OutDto extends Dto>
+        implements DomainService<Ety, ID, REPO, InDto, OutDto> {
 
     @SuppressWarnings("unchecked")
     public Class<Ety> getDomainClass() {

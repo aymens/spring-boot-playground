@@ -11,7 +11,6 @@ import io.playground.repository.CompanyRepository;
 import io.playground.service.CompanyService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,12 +18,13 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 @Service
 @RequiredArgsConstructor
-public class CompanyServiceImpl extends BaseDomainServiceImpl<Company, Long, CompanyIn, CompanyOut> implements CompanyService {
+public class CompanyServiceImpl extends BaseDomainServiceImpl<Company, Long, CompanyRepository, CompanyIn,
+        CompanyOut> implements CompanyService {
     private final CompanyRepository companyRepository;
     private final CompanyMapper companyMapper;
 
     @Override
-    public JpaRepository<Company, Long> getRepository() {
+    public CompanyRepository getRepository() {
         return companyRepository;
     }
 

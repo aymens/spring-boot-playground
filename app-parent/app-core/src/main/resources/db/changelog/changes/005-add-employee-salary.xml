@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <!-- First changeset: Add nullable salary -->
+    <changeSet id="005.011-add-employee-salary-column" author="aimen.saihi">
+        <addColumn tableName="employee">
+            <column name="salary" type="decimal(19,2)">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <!-- Second changeset: Data migration (example) -->
+    <changeSet id="005.012-set-default-salary" author="aimen.saihi">
+        <update tableName="employee">
+            <column name="salary" valueNumeric="0.00"/>
+            <where>salary IS NULL</where>
+        </update>
+    </changeSet>
+
+    <!-- Third changeset: Make non-nullable -->
+    <changeSet id="005.013-make-salary-required" author="aimen.saihi">
+        <addNotNullConstraint
+                tableName="employee"
+                columnName="salary"
+                columnDataType="decimal(19,2)"/>
+    </changeSet>
+
+    <!-- Fourth changeset: Add index if needed -->
+    <changeSet id="005.014-add-salary-index" author="aimen.saihi">
+        <createIndex tableName="employee" indexName="idx_employee_salary">
+            <column name="salary"/>
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>

@@ -47,7 +47,7 @@ public class FakerHelper {
     private static final Consumer<String> NO_OP_CONSUMER = _ -> {
     };
     private static final String UNIQUE_EMAIL_ERROR_MESSAGE =
-            "Couldn''t generate a valid unique email for {0} under {1} max attempts";
+            "Couldn''t generate a valid unique email for {0} in less than {1} attempts";
 
     private final Faker faker;
 

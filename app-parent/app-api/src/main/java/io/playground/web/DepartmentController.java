@@ -55,7 +55,7 @@ public class DepartmentController {
     @Parameter(name = "companyId", description = "Filter by company ID")
     @Parameter(name = "nameFilter", description = "Filter departments by name (case-insensitive)")
     @Parameter(name = "minEmployees", description = "Filter departments by minimum number of employees")
-    @GetMapping("/search")
+    @GetMapping("/find")
     public ResponseEntity<Page<DepartmentOut>> find(
             @RequestParam(required = false) Long companyId,
             @RequestParam(required = false) String nameFilter,
@@ -67,14 +67,12 @@ public class DepartmentController {
                     @SortDefault(sort = Department_.NAME, direction = Sort.Direction.ASC),
                     @SortDefault(sort = Department_.ID, direction = Sort.Direction.DESC)
             })
-            @ParameterObject // springdoc map query parameters to object
+            @ParameterObject // tells springdoc to map request params to object
             Pageable pageable) {
 
         Page<DepartmentOut> page = departmentService.find(companyId, nameFilter, minEmployees, pageable);
         return ResponseEntity.ok(page);
     }
-    //TODO test, master the pageable mvc handling, defaults, apply Page to all getAll* methods
-    //
-    // teach me mvc Pageable handling
+    //TODO apply Pageable to all getAll* methods
 
 }

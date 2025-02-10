@@ -20,7 +20,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @Slf4j
-class CompanyControllerIT extends BaseControllerIntegrationTest {
+class CompanyControllerIT extends BaseControllerIntegrationTest_Pg16 {
 
     private static final String BASE_URL = "/api/companies";
 

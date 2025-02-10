@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 
 @Entity
@@ -38,4 +39,7 @@ public class Employee implements Domain {
 
     @Column(name = "hire_date", nullable = false)
     private Instant hireDate;
+
+    @Column(nullable = false)
+    private BigDecimal salary;
 }

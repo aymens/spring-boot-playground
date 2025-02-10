@@ -21,7 +21,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Slf4j
-class DepartmentControllerIT extends BaseControllerIntegrationTest {
+class DepartmentControllerIT extends BaseControllerIntegrationTest_Pg16 {
 
     private static final String BASE_URL = "/api/departments";
 

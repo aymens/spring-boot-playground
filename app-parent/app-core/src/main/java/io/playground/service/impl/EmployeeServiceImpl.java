@@ -12,7 +12,6 @@ import io.playground.repository.DepartmentRepository;
 import io.playground.repository.EmployeeRepository;
 import io.playground.service.EmployeeService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,14 +21,15 @@ import java.util.stream.Collectors;
 @Transactional
 @Service
 @RequiredArgsConstructor
-public class EmployeeServiceImpl extends BaseDomainServiceImpl<Employee, Long, EmployeeIn, EmployeeOut> implements EmployeeService {
+public class EmployeeServiceImpl extends BaseDomainServiceImpl<Employee, Long, EmployeeRepository, EmployeeIn,
+        EmployeeOut> implements EmployeeService {
 
     private final EmployeeRepository employeeRepository;
     private final DepartmentRepository departmentRepository;
     private final EmployeeMapper employeeMapper;
 
     @Override
-    public JpaRepository<Employee, Long> getRepository() {
+    public EmployeeRepository getRepository() {
         return employeeRepository;
     }
 

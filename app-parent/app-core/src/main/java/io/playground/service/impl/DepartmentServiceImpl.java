@@ -16,7 +16,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,8 +28,8 @@ import static io.playground.repository.spec.DepartmentSpecs.*;
 @Transactional
 @Service
 @RequiredArgsConstructor
-public class DepartmentServiceImpl extends BaseDomainServiceImpl<Department, Long, DepartmentIn, DepartmentOut>
-        implements DepartmentService {
+public class DepartmentServiceImpl extends BaseDomainServiceImpl<Department, Long, DepartmentRepository, DepartmentIn,
+        DepartmentOut> implements DepartmentService {
 
     private final DepartmentRepository departmentRepository;
     private final CompanyRepository companyRepository;
@@ -38,7 +37,7 @@ public class DepartmentServiceImpl extends BaseDomainServiceImpl<Department, Lon
     private final EmployeeRepository employeeRepository;
 
     @Override
-    public JpaRepository<Department, Long> getRepository() {
+    public DepartmentRepository getRepository() {
         return departmentRepository;
     }
 

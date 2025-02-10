@@ -1,0 +1,50 @@
+#version: '3.8'
+name: "playground"
+services:
+#  rest-api:
+  sba:
+    build:
+      context: ./sba
+      dockerfile: Dockerfile
+    image: sba
+    container_name: sba
+    ports:
+      - "8081:8081"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8081/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+
+  db:
+    image: postgres:16
+    container_name: my_postgres
+    environment:
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypassword
+      POSTGRES_DB: mydatabase
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U myuser -d mydatabase" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+
+
+
+# docker compose restart
+# docker compose down && docker compose up -d
+
+# docker compose down db && docker compose up -d db
+# docker compose down sba && docker compose up -d sba
+# docker compose down sba && docker rm -f sba && docker compose up -d --force-recreate sba
+# docker compose down sba && docker rm -f sba && docker compose up -d --build --force-recreate sba

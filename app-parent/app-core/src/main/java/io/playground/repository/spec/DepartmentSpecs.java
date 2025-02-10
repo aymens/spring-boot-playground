@@ -23,7 +23,7 @@ public final class DepartmentSpecs {
      * associated company's ID.
      *
      * @param companyId the ID of the company to filter by. If null, no filtering
-     *                  will be applied for the company.
+     *                  will be applied for the department's company.
      * @return a {@link Specification} for filtering departments by company ID, or null
      *         if the provided companyId is null.
      */
