@@ -64,13 +64,11 @@ public class DepartmentServiceImpl extends BaseDomainServiceImpl<Department, Lon
 
     @Transactional(readOnly = true)
     @Override
-    public List<DepartmentOut> getByCompanyId(Long companyId) {
+    public Page<DepartmentOut> getByCompanyId(Long companyId, Pageable pageable) {
         if (!companyRepository.existsById(companyId)) {
             throw NotFoundException.of(Company.class.getName(), companyId);
         }
-        return departmentRepository.findByCompanyId(companyId).stream()
-                .map(departmentMapper::map)
-                .collect(Collectors.toList());
+        return departmentRepository.findByCompanyId(companyId, pageable).map(departmentMapper::map);
     }
 
     @Override

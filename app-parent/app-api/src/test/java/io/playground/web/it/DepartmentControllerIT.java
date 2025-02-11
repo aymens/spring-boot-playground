@@ -5,6 +5,7 @@ import io.playground.domain.Department;
 import io.playground.domain.Employee;
 import io.playground.model.DepartmentIn;
 import io.playground.model.DepartmentOut;
+import io.playground.test.data.TestPageModel;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -12,7 +13,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
 
 import java.time.Instant;
-import java.util.List;
 
 import static io.playground.helper.NumberUtils.randomBigDecimal;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -274,20 +274,19 @@ class DepartmentControllerIT extends BaseControllerIntegrationTest_Pg16 {
                     .andExpect(status().isOk())
                     .andReturn();
 
-            List<DepartmentOut> departments = objectMapper.readValue(
+            TestPageModel<DepartmentOut> departments = objectMapper.readValue(
                     listResult.getResponse().getContentAsString(),
-                    objectMapper.getTypeFactory().constructCollectionType(List.class, DepartmentOut.class)
+                    objectMapper.getTypeFactory().constructParametricType(TestPageModel.class, DepartmentOut.class)
             );
 
-            assertThat(departments)
-                    .hasSize(2)
-                    .extracting(DepartmentOut::getName)
-                    .containsExactlyInAnyOrder("HR", "IT");
-
-            assertThat(departments)
-                    .allSatisfy(department ->
-                            assertThat(department.getCompanyId()).isEqualTo(testCompany.getId())
-                    );
+            assertThat(departments).isNotNull()
+                    .satisfies(model ->
+                            assertThat(model.getContent())
+                                    .hasSize(2)
+                                    .allSatisfy(department ->
+                                            assertThat(department.getCompanyId()).isEqualTo(testCompany.getId())
+                                    ).extracting(DepartmentOut::getName)
+                                    .containsExactlyInAnyOrder("HR", "IT"));
         }
 
         @Test
@@ -317,12 +316,13 @@ class DepartmentControllerIT extends BaseControllerIntegrationTest_Pg16 {
                     .andExpect(status().isOk())
                     .andReturn();
 
-            List<DepartmentOut> departments = objectMapper.readValue(
+            TestPageModel<DepartmentOut> departments = objectMapper.readValue(
                     listResult.getResponse().getContentAsString(),
-                    objectMapper.getTypeFactory().constructCollectionType(List.class, DepartmentOut.class)
+                    objectMapper.getTypeFactory().constructParametricType(TestPageModel.class, DepartmentOut.class)
             );
 
-            assertThat(departments).isEmpty();
+            assertThat(departments).isNotNull()
+                    .satisfies(model -> assertThat(model.getContent()).isEmpty());
         }
 
         @Test
@@ -359,10 +359,10 @@ class DepartmentControllerIT extends BaseControllerIntegrationTest_Pg16 {
                     .andExpect(jsonPath("$.content", hasSize(1)))
                     .andExpect(jsonPath("$.content[0].id").value(department1.getId()))
                     .andExpect(jsonPath("$.content[0].name").value(department1.getName()))
-                    .andExpect(jsonPath("$.totalElements").value(1))
-                    .andExpect(jsonPath("$.totalPages").value(1))
-                    .andExpect(jsonPath("$.size").value(10))
-                    .andExpect(jsonPath("$.number").value(0));
+                    .andExpect(jsonPath("$.page.totalElements").value(1))
+                    .andExpect(jsonPath("$.page.totalPages").value(1))
+                    .andExpect(jsonPath("$.page.size").value(10))
+                    .andExpect(jsonPath("$.page.number").value(0));
         }
 
         @Test
@@ -377,7 +377,7 @@ class DepartmentControllerIT extends BaseControllerIntegrationTest_Pg16 {
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.content").isArray())
                     .andExpect(jsonPath("$.content", hasSize(3)))
-                    .andExpect(jsonPath("$.totalElements").value(3));
+                    .andExpect(jsonPath("$.page.totalElements").value(3));
         }
 
         @Test
@@ -394,7 +394,7 @@ class DepartmentControllerIT extends BaseControllerIntegrationTest_Pg16 {
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.content").isArray())
                     .andExpect(jsonPath("$.content", hasSize(0)))
-                    .andExpect(jsonPath("$.totalElements").value(0));
+                    .andExpect(jsonPath("$.page.totalElements").value(0));
         }
     }
 

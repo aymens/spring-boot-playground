@@ -10,11 +10,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.List;
-
+import static io.playground.test.data.PageUtils.pageOf;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -150,19 +150,19 @@ class DepartmentControllerTest {
                 .companyId(1L)
                 .build();
 
-        when(departmentService.getByCompanyId(1L)).thenReturn(List.of(dept1, dept2));
+        when(departmentService.getByCompanyId(eq(1L), any(Pageable.class))).thenReturn(pageOf(dept1, dept2));
 
         mockMvc.perform(get("/api/departments/company/1"))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(2)))
-                .andExpect(jsonPath("$[0].name").value("IT"))
-                .andExpect(jsonPath("$[1].name").value("HR"));
+                .andExpect(jsonPath("$.content", hasSize(2)))
+                .andExpect(jsonPath("$.content[0].name").value("IT"))
+                .andExpect(jsonPath("$.content[1].name").value("HR"));
     }
 
     @Test
     void getDepartments_WithInvalidCompany_ReturnsBadRequest() throws Exception {
-        when(departmentService.getByCompanyId(999L))
+        when(departmentService.getByCompanyId(eq(999L), any(Pageable.class)))
                 .thenThrow(new BusinessException("Company not found: 999"));
 
         mockMvc.perform(get("/api/departments/company/999"))

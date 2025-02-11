@@ -8,11 +8,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.lang.Nullable;
 
-import java.util.List;
-
 public interface DepartmentService extends DomainService<Department, Long, DepartmentRepository, DepartmentIn, DepartmentOut> {
 
-    List<DepartmentOut> getByCompanyId(Long companyId);
+    Page<DepartmentOut> getByCompanyId(Long companyId, Pageable pageable);
 
     void delete(Long id,
                 @Nullable Long transferToDepartmentId);

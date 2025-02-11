@@ -3,6 +3,7 @@ package io.playground.web.it;
 import io.playground.domain.Employee;
 import io.playground.model.EmployeeIn;
 import io.playground.model.EmployeeOut;
+import io.playground.test.data.TestPageModel;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -11,7 +12,6 @@ import org.springframework.test.web.servlet.MvcResult;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.List;
 
 import static io.playground.helper.NumberUtils.randomBigDecimal;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -249,15 +249,17 @@ class EmployeeControllerIT extends BaseControllerIntegrationTest_Pg16 {
                     .andExpect(status().isOk())
                     .andReturn();
 
-            List<EmployeeOut> employees = objectMapper.readValue(
+            TestPageModel<EmployeeOut> employees = objectMapper.readValue(
                     result.getResponse().getContentAsString(),
-                    objectMapper.getTypeFactory().constructCollectionType(List.class, EmployeeOut.class)
+                    objectMapper.getTypeFactory().constructParametricType(TestPageModel.class, EmployeeOut.class)
             );
 
-            assertThat(employees)
-                    .hasSize(2)
-                    .extracting(EmployeeOut::getDepartmentId)
-                    .containsOnly(testDepartment.getId());
+            assertThat(employees).isNotNull()
+                    .satisfies(model ->
+                            assertThat(model.getContent())
+                                    .hasSize(2)
+                                    .extracting(EmployeeOut::getDepartmentId)
+                                    .containsOnly(testDepartment.getId()));
         }
 
         @Test

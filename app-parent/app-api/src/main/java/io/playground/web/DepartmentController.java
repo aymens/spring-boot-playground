@@ -39,8 +39,10 @@ public class DepartmentController {
     }
 
     @GetMapping("/company/{companyId}")
-    public ResponseEntity<List<DepartmentOut>> getByCompanyId(@PathVariable Long companyId) {
-        return ResponseEntity.ok(departmentService.getByCompanyId(companyId));
+    public ResponseEntity<Page<DepartmentOut>> getByCompanyId(
+            @PathVariable Long companyId,
+            @ParameterObject Pageable pageable) {
+        return ResponseEntity.ok(departmentService.getByCompanyId(companyId, pageable));
     }
 
     @DeleteMapping("/{id}")
@@ -73,6 +75,4 @@ public class DepartmentController {
         Page<DepartmentOut> page = departmentService.find(companyId, nameFilter, minEmployees, pageable);
         return ResponseEntity.ok(page);
     }
-    //TODO apply Pageable to all getAll* methods
-
 }

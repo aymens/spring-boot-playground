@@ -28,9 +28,13 @@ public final class EmployeeSpecs {
      * if the specified date is null.
      */
     public static Specification<Employee> hiredSince(Instant since) {
-        return (root, _, cb) -> Optional.ofNullable(since)
-                .map(date -> cb.greaterThanOrEqualTo(root.get(Employee_.hireDate), date))
-                .orElse(null);
+        return (root, _, cb) ->
+                Optional.ofNullable(since)
+                        .map(_ ->
+                                cb.greaterThanOrEqualTo(
+                                        root.get(Employee_.hireDate),
+                                        since))
+                        .orElse(null);
     }
 
     /**
@@ -43,9 +47,11 @@ public final class EmployeeSpecs {
     public static Specification<Employee> inDepartment(Long departmentId) {
         return (root, _, cb) ->
                 Optional.ofNullable(departmentId)
-                        .map(id -> cb.equal(root.get(Employee_.department).get(Department_.id), id))
+                        .map(id ->
+                                cb.equal(
+                                        root.get(Employee_.department).get(Department_.id),
+                                        id))
                         .orElse(null);
-
     }
 
     /**
@@ -57,12 +63,14 @@ public final class EmployeeSpecs {
      * or null if the provided minimum salary is null.
      */
     public static Specification<Employee> withMinSalary(BigDecimal minSalary) {
-        return (root, _, cb) -> Optional.ofNullable(minSalary)
-                .map(salary -> cb.greaterThanOrEqualTo(
-                        root.get(Employee_.salary),
-                        salary
-                ))
-                .orElse(null);
+        return (root, _, cb) ->
+                Optional.ofNullable(minSalary)
+                        .map(_ ->
+                                cb.greaterThanOrEqualTo(
+                                        root.get(Employee_.salary),
+                                        minSalary
+                                ))
+                        .orElse(null);
     }
 
     /**
@@ -74,11 +82,13 @@ public final class EmployeeSpecs {
      * or null if the provided companyId is null.
      */
     public static Specification<Employee> inCompany(Long companyId) {
-        return (root, _, cb) -> Optional.ofNullable(companyId)
-                .map(id -> cb.equal(
-                        root.get(Employee_.department).get(Department_.company).get(Company_.id),
-                        id
-                ))
-                .orElse(null);
+        return (root, _, cb) ->
+                Optional.ofNullable(companyId)
+                        .map(id ->
+                                cb.equal(
+                                        root.get(Employee_.department).get(Department_.company).get(Company_.id),
+                                        companyId
+                                ))
+                        .orElse(null);
     }
 }

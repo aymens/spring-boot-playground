@@ -10,15 +10,15 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.Collections;
-import java.util.List;
 
 import static io.playground.helper.NumberUtils.randomBigDecimal;
+import static io.playground.test.data.PageUtils.pageOf;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -199,24 +199,24 @@ class EmployeeControllerTest {
                 .firstName("Jane")
                 .build();
 
-        when(employeeService.getByDepartmentId(1L)).thenReturn(List.of(employee1, employee2));
+        when(employeeService.getByDepartmentId(eq(1L), any(Pageable.class))).thenReturn(pageOf(employee1, employee2));
 
         mockMvc.perform(get("/api/employees/department/1"))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(2)))
-                .andExpect(jsonPath("$[0].firstName").value("John"))
-                .andExpect(jsonPath("$[1].firstName").value("Jane"));
+                .andExpect(jsonPath("$.content", hasSize(2)))
+                .andExpect(jsonPath("$.content[0].firstName").value("John"))
+                .andExpect(jsonPath("$.content[1].firstName").value("Jane"));
     }
 
     @Test
     void getEmployees_WhenEmpty_ReturnsList() throws Exception {
-        when(employeeService.getByDepartmentId(1L)).thenReturn(Collections.emptyList());
+        when(employeeService.getByDepartmentId(eq(1L), any(Pageable.class))).thenReturn(pageOf());
 
         mockMvc.perform(get("/api/employees/department/1"))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(0)));
+                .andExpect(jsonPath("$.content", hasSize(0)));
     }
 
     @Test

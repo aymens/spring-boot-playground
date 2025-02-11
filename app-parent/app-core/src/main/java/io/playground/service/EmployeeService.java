@@ -4,9 +4,9 @@ import io.playground.domain.Employee;
 import io.playground.model.EmployeeIn;
 import io.playground.model.EmployeeOut;
 import io.playground.repository.EmployeeRepository;
-
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface EmployeeService extends DomainService<Employee, Long, EmployeeRepository, EmployeeIn, EmployeeOut> {
-    List<EmployeeOut> getByDepartmentId(Long departmentId);
+    Page<EmployeeOut> getByDepartmentId(Long departmentId, Pageable pageable);
 }

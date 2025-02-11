@@ -5,6 +5,6 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class NumberUtils {
     public static BigDecimal randomBigDecimal() {
-        return BigDecimal.valueOf(ThreadLocalRandom.current().nextInt(Integer.MAX_VALUE));
+        return BigDecimal.valueOf(ThreadLocalRandom.current().nextInt(1, Integer.MAX_VALUE));
     }
 }

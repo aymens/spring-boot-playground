@@ -12,9 +12,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.time.Instant;
-import java.util.List;
 
 import static io.playground.helper.NumberUtils.randomBigDecimal;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -128,7 +129,7 @@ class EmployeeServiceIT extends BaseServiceIntegrationTest_Pg16 {
             Employee employee1 = createTestEmployee(testDepartment);
             Employee employee2 = createTestEmployee(testDepartment);
 
-            List<EmployeeOut> results = employeeService.getByDepartmentId(testDepartment.getId());
+            Page<EmployeeOut> results = employeeService.getByDepartmentId(testDepartment.getId(), Pageable.unpaged());
 
             assertThat(results)
                     .hasSize(2)
@@ -141,14 +142,14 @@ class EmployeeServiceIT extends BaseServiceIntegrationTest_Pg16 {
             Long invalidDepartmentId = testDepartment.getId();
             departmentRepository.deleteById(invalidDepartmentId);
 
-            assertThatThrownBy(() -> employeeService.getByDepartmentId(invalidDepartmentId))
+            assertThatThrownBy(() -> employeeService.getByDepartmentId(invalidDepartmentId, Pageable.unpaged()))
                     .isInstanceOf(BusinessException.class)
                     .hasMessageContaining("Department not found: " + invalidDepartmentId);
         }
 
         @Test
         void getByDepartmentId_WithNoEmployees_ReturnsEmptyList() {
-            List<EmployeeOut> results = employeeService.getByDepartmentId(testDepartment.getId());
+            Page<EmployeeOut> results = employeeService.getByDepartmentId(testDepartment.getId(), Pageable.unpaged());
             assertThat(results).isEmpty();
         }
     }

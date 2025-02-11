@@ -160,7 +160,7 @@ class DepartmentServiceIT extends BaseServiceIntegrationTest_Pg16 {
         void getByCompanyId_ReturnsCorrectDtos() {
             List<Department> departments = createTestDepartments(testCompany, 3);
 
-            List<DepartmentOut> results = departmentService.getByCompanyId(testCompany.getId());
+            Page<DepartmentOut> results = departmentService.getByCompanyId(testCompany.getId(), Pageable.unpaged());
 
             assertThat(results)
                     .hasSize(3)
@@ -185,14 +185,14 @@ class DepartmentServiceIT extends BaseServiceIntegrationTest_Pg16 {
             Long deletedId = testCompany.getId();
             companyRepository.deleteById(deletedId);
 
-            assertThatThrownBy(() -> departmentService.getByCompanyId(deletedId))
+            assertThatThrownBy(() -> departmentService.getByCompanyId(deletedId, Pageable.unpaged()))
                     .isInstanceOf(NotFoundException.class)
                     .hasMessageContaining("Company(" + deletedId + ") not found");
         }
 
         @Test
         void getByCompanyId_WithoutDepartments_ReturnsEmptyList() {
-            List<DepartmentOut> results = departmentService.getByCompanyId(testCompany.getId());
+            Page<DepartmentOut> results = departmentService.getByCompanyId(testCompany.getId(), Pageable.unpaged());
             assertThat(results).isEmpty();
         }
 
@@ -373,7 +373,7 @@ class DepartmentServiceIT extends BaseServiceIntegrationTest_Pg16 {
 
             assertThat(departmentRepository.existsById(sourceDept.getId())).isFalse();
 
-            List<Employee> transferredEmployees = employeeRepository.findByDepartmentId(targetDept.getId());
+            Page<Employee> transferredEmployees = employeeRepository.findByDepartmentId(targetDept.getId(), Pageable.unpaged());
             assertThat(transferredEmployees)
                     .hasSize(2)
                     .extracting(Employee::getId)

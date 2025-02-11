@@ -7,9 +7,10 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
 
-import java.text.MessageFormat;
 import java.util.Optional;
 import java.util.function.Predicate;
+
+import static java.text.MessageFormat.format;
 
 /**
  * Utility class providing static methods to create JPA Specifications for the Department entity.
@@ -25,12 +26,16 @@ public final class DepartmentSpecs {
      * @param companyId the ID of the company to filter by. If null, no filtering
      *                  will be applied for the department's company.
      * @return a {@link Specification} for filtering departments by company ID, or null
-     *         if the provided companyId is null.
+     * if the provided companyId is null.
      */
     public static Specification<Department> hasCompanyId(Long companyId) {
-        return (root, _, cb) -> Optional.ofNullable(companyId)
-                .map(id -> cb.equal(root.get(Department_.company).get(Company_.id), id))
-                .orElse(null);
+        return (root, _, cb) ->
+                Optional.ofNullable(companyId)
+                        .map(_ ->
+                                cb.equal(
+                                        root.get(Department_.company).get(Company_.id),
+                                        companyId))
+                        .orElse(null);
 
     }
 
@@ -42,13 +47,15 @@ public final class DepartmentSpecs {
      * @return a specification to filter departments by name, or null if the name is null or blank.
      */
     public static Specification<Department> nameContains(String name) {
-        return (root, _, cb) -> Optional.ofNullable(name)
-                .filter(Predicate.not(String::isBlank))
-                .map(s -> cb.like(
-                        cb.upper(root.get(Department_.name)),
-                        MessageFormat.format("%{0}%", s.toUpperCase())
-                ))
-                .orElse(null);
+        return (root, _, cb) ->
+                Optional.ofNullable(name)
+                        .filter(Predicate.not(String::isBlank))
+                        .map(_ ->
+                                cb.like(
+                                        cb.upper(root.get(Department_.name)),
+                                        format("%{0}%", name.toUpperCase())
+                                ))
+                        .orElse(null);
 
     }
 
@@ -63,11 +70,10 @@ public final class DepartmentSpecs {
      */
     public static Specification<Department> hasMinEmployees(Integer count) {
         return (root, _, cb) -> Optional.ofNullable(count)
-                .map(i -> cb.ge(
-                        cb.size(root.get(Department_.employees)),
-                        i
-                ))
+                .map(_ ->
+                        cb.ge(
+                                cb.size(root.get(Department_.employees)),
+                                count))
                 .orElse(null);
-
     }
 }

@@ -4,22 +4,20 @@ import io.playground.domain.Employee;
 import io.playground.repository.spec.EmployeeSpecs;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 
 import java.time.Instant;
-import java.util.List;
 
 public interface EmployeeRepository extends BaseJpaRepository<Employee, Long> {
-    List<Employee> findByDepartmentId(Long departmentId);
+    Page<Employee> findByDepartmentId(Long departmentId, Pageable pageable);
 
     boolean existsByEmail(String email);
 
     //TODO do something with these: service; controller; test
-    List<Employee> findByHireDateIsGreaterThanEqual(Instant since);
+    Page<Employee> findByHireDateIsGreaterThanEqual(Instant since, Pageable pageable);
 
-    List<Employee> findByDepartmentCompanyId(Long companyId);
+    Page<Employee> findByDepartmentCompanyId(Long companyId, Pageable pageable);
 
-    List<Employee> findByLastNameContainingIgnoreCase(String prefix);
+    Page<Employee> findByLastNameContainingIgnoreCase(String prefix, Pageable pageable);
 
     /**
      * Retrieves a paginated list of employees associated with the specified company ID.
