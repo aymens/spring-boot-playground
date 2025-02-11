@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.time.Instant;
 import java.util.List;
 
+import static io.playground.helper.NumberUtils.randomBigDecimal;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -39,6 +40,7 @@ class EmployeeServiceIT extends BaseServiceIntegrationTest_Pg16 {
                 .email(faker.internet().emailAddress())
                 .departmentId(testDepartment.getId())
                 .hireDate(Instant.now())
+                .salary(randomBigDecimal())
                 .build();
     }
 

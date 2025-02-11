@@ -14,9 +14,11 @@ import org.springframework.test.web.servlet.MvcResult;
 import java.time.Instant;
 import java.util.List;
 
+import static io.playground.helper.NumberUtils.randomBigDecimal;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -37,6 +39,7 @@ class DepartmentControllerIT extends BaseControllerIntegrationTest_Pg16 {
             MvcResult result = mockMvc.perform(post(BASE_URL)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(departmentIn)))
+                    .andDo(print())
                     .andExpect(status().isOk())
                     .andReturn();
 
@@ -64,6 +67,7 @@ class DepartmentControllerIT extends BaseControllerIntegrationTest_Pg16 {
             mockMvc.perform(post(BASE_URL)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(departmentIn)))
+                    .andDo(print())
                     .andExpect(status().isNotFound())
                     .andExpect(result ->
                             assertThat(result.getResponse().getContentAsString())
@@ -81,12 +85,14 @@ class DepartmentControllerIT extends BaseControllerIntegrationTest_Pg16 {
             mockMvc.perform(post(BASE_URL)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(departmentIn)))
+                    .andDo(print())
                     .andExpect(status().isOk());
 
             // Try to create another with same name
             mockMvc.perform(post(BASE_URL)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(departmentIn)))
+                    .andDo(print())
                     .andExpect(status().isBadRequest())
                     .andExpect(result ->
                             assertThat(result.getResponse().getContentAsString())
@@ -104,6 +110,7 @@ class DepartmentControllerIT extends BaseControllerIntegrationTest_Pg16 {
             mockMvc.perform(post(BASE_URL)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(emptyName)))
+                    .andDo(print())
                     .andExpect(status().isBadRequest())
                     .andExpect(result ->
                             assertThat(result.getResponse().getContentAsString())
@@ -118,6 +125,7 @@ class DepartmentControllerIT extends BaseControllerIntegrationTest_Pg16 {
             mockMvc.perform(post(BASE_URL)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(nullCompany)))
+                    .andDo(print())
                     .andExpect(status().isBadRequest())
                     .andExpect(result ->
                             assertThat(result.getResponse().getContentAsString())
@@ -134,6 +142,7 @@ class DepartmentControllerIT extends BaseControllerIntegrationTest_Pg16 {
             mockMvc.perform(post(BASE_URL)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(longName)))
+                    .andDo(print())
                     .andExpect(status().isBadRequest())
                     .andExpect(result ->
                             assertThat(result.getResponse().getContentAsString())
@@ -159,6 +168,7 @@ class DepartmentControllerIT extends BaseControllerIntegrationTest_Pg16 {
             mockMvc.perform(post(BASE_URL)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(dept1)))
+                    .andDo(print())
                     .andExpect(status().isOk());
 
             // Create department with same name in second company
@@ -170,6 +180,7 @@ class DepartmentControllerIT extends BaseControllerIntegrationTest_Pg16 {
             MvcResult result = mockMvc.perform(post(BASE_URL)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(dept2)))
+                    .andDo(print())
                     .andExpect(status().isOk())
                     .andReturn();
 
@@ -200,6 +211,7 @@ class DepartmentControllerIT extends BaseControllerIntegrationTest_Pg16 {
             MvcResult createResult = mockMvc.perform(post(BASE_URL)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(departmentIn)))
+                    .andDo(print())
                     .andExpect(status().isOk())
                     .andReturn();
 
@@ -211,6 +223,7 @@ class DepartmentControllerIT extends BaseControllerIntegrationTest_Pg16 {
             // Then retrieve it
             MvcResult getResult = mockMvc.perform(get(BASE_URL + "/{id}", created.getId())
                             .contentType(MediaType.APPLICATION_JSON))
+                    .andDo(print())
                     .andExpect(status().isOk())
                     .andReturn();
 
@@ -245,16 +258,19 @@ class DepartmentControllerIT extends BaseControllerIntegrationTest_Pg16 {
             mockMvc.perform(post(BASE_URL)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(dept1)))
+                    .andDo(print())
                     .andExpect(status().isOk());
 
             mockMvc.perform(post(BASE_URL)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(dept2)))
+                    .andDo(print())
                     .andExpect(status().isOk());
 
             // List departments by company
             MvcResult listResult = mockMvc.perform(get(BASE_URL + "/company/{companyId}", testCompany.getId())
                             .contentType(MediaType.APPLICATION_JSON))
+                    .andDo(print())
                     .andExpect(status().isOk())
                     .andReturn();
 
@@ -278,6 +294,7 @@ class DepartmentControllerIT extends BaseControllerIntegrationTest_Pg16 {
         void getDepartment_NonExistentId_ReturnsNotFound() throws Exception {
             mockMvc.perform(get(BASE_URL + "/{id}", 99999L)
                             .contentType(MediaType.APPLICATION_JSON))
+                    .andDo(print())
                     .andExpect(status().isNotFound())
                     .andExpect(result ->
                             assertThat(result.getResponse().getContentAsString())
@@ -296,6 +313,7 @@ class DepartmentControllerIT extends BaseControllerIntegrationTest_Pg16 {
 
             MvcResult listResult = mockMvc.perform(get(BASE_URL + "/company/{companyId}", emptyCompany.getId())
                             .contentType(MediaType.APPLICATION_JSON))
+                    .andDo(print())
                     .andExpect(status().isOk())
                     .andReturn();
 
@@ -311,6 +329,7 @@ class DepartmentControllerIT extends BaseControllerIntegrationTest_Pg16 {
         void listDepartmentsByCompany_CompanyNotFound_ReturnsBadRequest() throws Exception {
             mockMvc.perform(get(BASE_URL + "/company/{companyId}", 99999L)
                             .contentType(MediaType.APPLICATION_JSON))
+                    .andDo(print())
                     .andExpect(status().isNotFound())
                     .andExpect(result ->
                             assertThat(result.getResponse().getContentAsString())
@@ -327,13 +346,14 @@ class DepartmentControllerIT extends BaseControllerIntegrationTest_Pg16 {
             createTestEmployee(department2);
 
             // When/Then
-            mockMvc.perform(get("/api/departments/search")
+            mockMvc.perform(get("/api/departments/find")
                             .param("companyId", testCompany.getId().toString())
                             .param("minEmployees", "2")
                             .param("nameFilter", department1.getName().substring(0, 3))
                             .param("page", "0")
                             .param("size", "10")
                             .param("sort", "name,desc"))
+                    .andDo(print())
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.content").isArray())
                     .andExpect(jsonPath("$.content", hasSize(1)))
@@ -352,7 +372,8 @@ class DepartmentControllerIT extends BaseControllerIntegrationTest_Pg16 {
             createTestDepartments(testCompany, 3);
 
             // When/Then
-            mockMvc.perform(get("/api/departments/search"))
+            mockMvc.perform(get("/api/departments/find"))
+                    .andDo(print())
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.content").isArray())
                     .andExpect(jsonPath("$.content", hasSize(3)))
@@ -367,8 +388,9 @@ class DepartmentControllerIT extends BaseControllerIntegrationTest_Pg16 {
             }
 
             // When/Then
-            mockMvc.perform(get("/api/departments/search")
+            mockMvc.perform(get("/api/departments/find")
                             .param("companyId", "99999"))
+                    .andDo(print())
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.content").isArray())
                     .andExpect(jsonPath("$.content", hasSize(0)))
@@ -389,6 +411,7 @@ class DepartmentControllerIT extends BaseControllerIntegrationTest_Pg16 {
             MvcResult createResult = mockMvc.perform(post(BASE_URL)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(dept1)))
+                    .andDo(print())
                     .andExpect(status().isOk())
                     .andReturn();
 
@@ -406,11 +429,13 @@ class DepartmentControllerIT extends BaseControllerIntegrationTest_Pg16 {
                     .email("john@example.com")
                     .department(department)
                     .hireDate(Instant.now())
+                    .salary(randomBigDecimal())
                     .build();
             employeeRepository.save(employee);
 
             // Try to delete without transfer department
             mockMvc.perform(delete(BASE_URL + "/{id}", created.getId()))
+                    .andDo(print())
                     .andExpect(status().isBadRequest())
                     .andExpect(result ->
                             assertThat(result.getResponse().getContentAsString())
@@ -428,6 +453,7 @@ class DepartmentControllerIT extends BaseControllerIntegrationTest_Pg16 {
             MvcResult createResult1 = mockMvc.perform(post(BASE_URL)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(dept1)))
+                    .andDo(print())
                     .andExpect(status().isOk())
                     .andReturn();
 
@@ -445,6 +471,7 @@ class DepartmentControllerIT extends BaseControllerIntegrationTest_Pg16 {
             MvcResult createResult2 = mockMvc.perform(post(BASE_URL)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(dept2)))
+                    .andDo(print())
                     .andExpect(status().isOk())
                     .andReturn();
 
@@ -462,12 +489,14 @@ class DepartmentControllerIT extends BaseControllerIntegrationTest_Pg16 {
                     .email("john@example.com")
                     .department(department1)
                     .hireDate(Instant.now())
+                    .salary(randomBigDecimal())
                     .build();
             Employee savedEmployee = employeeRepository.save(employee);
 
             // Delete first department with transfer
             mockMvc.perform(delete(BASE_URL + "/{id}?transferToId={transferId}",
                             created1.getId(), created2.getId()))
+                    .andDo(print())
                     .andExpect(status().isNoContent());
 
             // Verify
@@ -490,6 +519,7 @@ class DepartmentControllerIT extends BaseControllerIntegrationTest_Pg16 {
             MvcResult createResult1 = mockMvc.perform(post(BASE_URL)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(dept1)))
+                    .andDo(print())
                     .andExpect(status().isOk())
                     .andReturn();
 
@@ -512,6 +542,7 @@ class DepartmentControllerIT extends BaseControllerIntegrationTest_Pg16 {
             MvcResult createResult2 = mockMvc.perform(post(BASE_URL)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(dept2)))
+                    .andDo(print())
                     .andExpect(status().isOk())
                     .andReturn();
 
@@ -529,12 +560,14 @@ class DepartmentControllerIT extends BaseControllerIntegrationTest_Pg16 {
                     .email("john@example.com")
                     .department(department1)
                     .hireDate(Instant.now())
+                    .salary(randomBigDecimal())
                     .build();
             employeeRepository.save(employee);
 
             // Try to transfer to department in different company
             mockMvc.perform(delete(BASE_URL + "/{id}?transferToId={transferId}",
                             created1.getId(), created2.getId()))
+                    .andDo(print())
                     .andExpect(status().isBadRequest())
                     .andExpect(result ->
                             assertThat(result.getResponse().getContentAsString())
@@ -552,6 +585,7 @@ class DepartmentControllerIT extends BaseControllerIntegrationTest_Pg16 {
             MvcResult createResult = mockMvc.perform(post(BASE_URL)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(dept)))
+                    .andDo(print())
                     .andExpect(status().isOk())
                     .andReturn();
 
@@ -569,12 +603,14 @@ class DepartmentControllerIT extends BaseControllerIntegrationTest_Pg16 {
                     .email("john@example.com")
                     .department(department)
                     .hireDate(Instant.now())
+                    .salary(randomBigDecimal())
                     .build();
             employeeRepository.save(employee);
 
             // Try to transfer to self
             mockMvc.perform(delete(BASE_URL + "/{id}?transferToId={transferId}",
                             created.getId(), created.getId()))
+                    .andDo(print())
                     .andExpect(status().isBadRequest())
                     .andExpect(result ->
                             assertThat(result.getResponse().getContentAsString())
@@ -592,6 +628,7 @@ class DepartmentControllerIT extends BaseControllerIntegrationTest_Pg16 {
             MvcResult createResult = mockMvc.perform(post(BASE_URL)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(departmentIn)))
+                    .andDo(print())
                     .andExpect(status().isOk())
                     .andReturn();
 
@@ -602,10 +639,12 @@ class DepartmentControllerIT extends BaseControllerIntegrationTest_Pg16 {
 
             // Delete the department
             mockMvc.perform(delete(BASE_URL + "/{id}", created.getId()))
+                    .andDo(print())
                     .andExpect(status().isNoContent());
 
             // Verify it's deleted by trying to get it
             mockMvc.perform(get(BASE_URL + "/{id}", created.getId()))
+                    .andDo(print())
                     .andExpect(status().isNotFound());
         }
     }

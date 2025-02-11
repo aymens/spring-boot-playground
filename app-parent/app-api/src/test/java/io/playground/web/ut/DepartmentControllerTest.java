@@ -19,6 +19,7 @@ import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(DepartmentController.class)
@@ -50,6 +51,7 @@ class DepartmentControllerTest {
         mockMvc.perform(post("/api/departments")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(input)))
+                .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.name").value("IT"))
@@ -63,6 +65,7 @@ class DepartmentControllerTest {
         mockMvc.perform(post("/api/departments")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(input)))
+                .andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.name").value("Department name is required"))
                 .andExpect(jsonPath("$.companyId").value("Company ID is required"));
@@ -81,6 +84,7 @@ class DepartmentControllerTest {
         mockMvc.perform(post("/api/departments")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(input)))
+                .andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string("Department IT already exists in company 1"));
     }
@@ -98,6 +102,7 @@ class DepartmentControllerTest {
         mockMvc.perform(post("/api/departments")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(input)))
+                .andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string("Company not found: 999"));
     }
@@ -113,6 +118,7 @@ class DepartmentControllerTest {
         when(departmentService.getById(1L)).thenReturn(output);
 
         mockMvc.perform(get("/api/departments/1"))
+                .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.name").value("IT"))
@@ -125,6 +131,7 @@ class DepartmentControllerTest {
                 .thenThrow(new BusinessException("Department not found: 999"));
 
         mockMvc.perform(get("/api/departments/999"))
+                .andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string("Department not found: 999"));
     }
@@ -146,6 +153,7 @@ class DepartmentControllerTest {
         when(departmentService.getByCompanyId(1L)).thenReturn(List.of(dept1, dept2));
 
         mockMvc.perform(get("/api/departments/company/1"))
+                .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(2)))
                 .andExpect(jsonPath("$[0].name").value("IT"))
@@ -158,6 +166,7 @@ class DepartmentControllerTest {
                 .thenThrow(new BusinessException("Company not found: 999"));
 
         mockMvc.perform(get("/api/departments/company/999"))
+                .andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string("Company not found: 999"));
     }
@@ -167,6 +176,7 @@ class DepartmentControllerTest {
         doNothing().when(departmentService).delete(eq(1L), isNull());
 
         mockMvc.perform(delete("/api/departments/1"))
+                .andDo(print())
                 .andExpect(status().isNoContent());
 
         verify(departmentService).delete(1L, null);
@@ -178,6 +188,7 @@ class DepartmentControllerTest {
                 .when(departmentService).delete(eq(999L), isNull());
 
         mockMvc.perform(delete("/api/departments/999"))
+                .andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string("Department not found: 999"));
     }

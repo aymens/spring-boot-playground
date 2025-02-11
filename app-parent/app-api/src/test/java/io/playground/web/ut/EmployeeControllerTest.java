@@ -18,10 +18,12 @@ import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.List;
 
+import static io.playground.helper.NumberUtils.randomBigDecimal;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(EmployeeController.class)
@@ -43,6 +45,7 @@ class EmployeeControllerTest {
                 .email("john@example.com")
                 .departmentId(1L)
                 .hireDate(Instant.now())
+                .salary(randomBigDecimal())
                 .build();
 
         EmployeeOut output = EmployeeOut.builder()
@@ -52,6 +55,7 @@ class EmployeeControllerTest {
                 .email("john@example.com")
                 .departmentId(1L)
                 .hireDate(input.getHireDate())
+                .salary(randomBigDecimal())
                 .build();
 
         when(employeeService.create(any(EmployeeIn.class))).thenReturn(output);
@@ -59,6 +63,7 @@ class EmployeeControllerTest {
         mockMvc.perform(post("/api/employees")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(input)))
+                .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.firstName").value("John"))
@@ -73,6 +78,7 @@ class EmployeeControllerTest {
         mockMvc.perform(post("/api/employees")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(input)))
+                .andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.firstName").value("First name is required"))
                 .andExpect(jsonPath("$.lastName").value("Last name is required"))
@@ -94,6 +100,7 @@ class EmployeeControllerTest {
         mockMvc.perform(post("/api/employees")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(input)))
+                .andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.email").value("Invalid email format"));
     }
@@ -111,6 +118,7 @@ class EmployeeControllerTest {
         mockMvc.perform(post("/api/employees")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(input)))
+                .andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.hireDate").value("Hire date cannot be in the future"));
     }
@@ -123,6 +131,7 @@ class EmployeeControllerTest {
                 .email("existing@example.com")
                 .departmentId(1L)
                 .hireDate(Instant.now())
+                .salary(randomBigDecimal())
                 .build();
 
         when(employeeService.create(any(EmployeeIn.class)))
@@ -131,6 +140,7 @@ class EmployeeControllerTest {
         mockMvc.perform(post("/api/employees")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(input)))
+                .andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string("Employee with email already exists"));
     }
@@ -143,6 +153,7 @@ class EmployeeControllerTest {
                 .email("john@example.com")
                 .departmentId(999L)
                 .hireDate(Instant.now())
+                .salary(randomBigDecimal())
                 .build();
 
         when(employeeService.create(any(EmployeeIn.class)))
@@ -151,6 +162,7 @@ class EmployeeControllerTest {
         mockMvc.perform(post("/api/employees")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(input)))
+                .andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string("Department not found: 999"));
     }
@@ -169,6 +181,7 @@ class EmployeeControllerTest {
         when(employeeService.getById(1L)).thenReturn(output);
 
         mockMvc.perform(get("/api/employees/1"))
+                .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.firstName").value("John"));
@@ -189,6 +202,7 @@ class EmployeeControllerTest {
         when(employeeService.getByDepartmentId(1L)).thenReturn(List.of(employee1, employee2));
 
         mockMvc.perform(get("/api/employees/department/1"))
+                .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(2)))
                 .andExpect(jsonPath("$[0].firstName").value("John"))
@@ -200,6 +214,7 @@ class EmployeeControllerTest {
         when(employeeService.getByDepartmentId(1L)).thenReturn(Collections.emptyList());
 
         mockMvc.perform(get("/api/employees/department/1"))
+                .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(0)));
     }
@@ -209,6 +224,7 @@ class EmployeeControllerTest {
         doNothing().when(employeeService).delete(1L);
 
         mockMvc.perform(delete("/api/employees/1"))
+                .andDo(print())
                 .andExpect(status().isNoContent());
     }
 
@@ -218,6 +234,7 @@ class EmployeeControllerTest {
                 .when(employeeService).delete(999L);
 
         mockMvc.perform(delete("/api/employees/999"))
+                .andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string("Employee not found: 999"));
     }

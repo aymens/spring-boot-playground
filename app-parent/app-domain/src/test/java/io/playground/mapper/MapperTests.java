@@ -50,11 +50,12 @@ class MapperTests {
 
         @Test
         void map_WithValidDomain_ReturnsExpectedDto() {
-            Company company = new Company();
-            company.setId(1L);
-            company.setName("Acme Corp");
-            company.setTaxId("1234567890");
-            company.setCreatedAt(Instant.now());
+            Company company = Company.builder()
+                    .id(1L)
+                    .name("Acme Corp")
+                    .taxId("1234567890")
+                    .createdAt(Instant.now())
+                    .build();
 
             CompanyOut out = companyMapper.map(company);
 
@@ -91,13 +92,15 @@ class MapperTests {
 
         @Test
         void map_WithValidDepartmentDomain_ReturnsExpectedDto() {
-            Company company = new Company();
-            company.setId(1L);
+            Company company = Company.builder()
+                    .id(1L)
+                    .build();
 
-            Department dept = new Department();
-            dept.setId(2L);
-            dept.setName("IT");
-            dept.setCompany(company);
+            Department dept = Department.builder()
+                    .id(2L)
+                    .name("IT")
+                    .company(company)
+                    .build();
 
             DepartmentOut out = departmentMapper.map(dept);
 
@@ -143,13 +146,14 @@ class MapperTests {
             Department dept = new Department();
             dept.setId(1L);
 
-            Employee employee = new Employee();
-            employee.setId(2L);
-            employee.setFirstName("John");
-            employee.setLastName("Doe");
-            employee.setEmail("john@example.com");
-            employee.setHireDate(Instant.now());
-            employee.setDepartment(dept);
+            Employee employee = Employee.builder()
+                    .id(2L)
+                    .firstName("John")
+                    .lastName("Doe")
+                    .email("john@example.com")
+                    .hireDate(Instant.now())
+                    .department(dept)
+                    .build();
 
             EmployeeOut out = employeeMapper.map(employee);
 

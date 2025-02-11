@@ -20,6 +20,7 @@ import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(CompanyController.class)
@@ -52,6 +53,7 @@ class CompanyControllerTest {
         mockMvc.perform(post("/api/companies")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(input)))
+                .andDo(print())
                 .andExpect(status().isCreated())  // Changed to 201
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.name").value("Acme"))
@@ -65,6 +67,7 @@ class CompanyControllerTest {
         mockMvc.perform(post("/api/companies")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(input)))
+                .andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.name").value("Company name is required"))
                 .andExpect(jsonPath("$.taxId").value("Tax ID is required"));
@@ -79,6 +82,7 @@ class CompanyControllerTest {
         mockMvc.perform(post("/api/companies")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(input)))
+                .andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.name").value("Company name cannot exceed 100 characters"));
     }
@@ -93,6 +97,7 @@ class CompanyControllerTest {
         mockMvc.perform(post("/api/companies")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(input)))
+                .andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.taxId").value("Tax ID must be exactly 10 digits"));
     }
@@ -108,6 +113,7 @@ class CompanyControllerTest {
         mockMvc.perform(post("/api/companies")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(input)))
+                .andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.taxId").value("Tax ID must be exactly 10 digits"));
     }
@@ -125,6 +131,7 @@ class CompanyControllerTest {
         mockMvc.perform(post("/api/companies")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(input)))
+                .andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string("Company with tax ID already exists: 1234567890"));
     }
@@ -140,6 +147,7 @@ class CompanyControllerTest {
         when(companyService.getById(1L)).thenReturn(output);
 
         mockMvc.perform(get("/api/companies/1"))
+                .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.name").value("Acme"))
@@ -149,6 +157,7 @@ class CompanyControllerTest {
     @Test
     void getCompany_WithNegativeId_ReturnsBadRequest() throws Exception {
         mockMvc.perform(get("/api/companies/-1"))
+                .andDo(print())
                 .andExpect(status().isBadRequest());
     }
 
@@ -158,6 +167,7 @@ class CompanyControllerTest {
                 .thenThrow(new BusinessException("Company not found: 999"));
 
         mockMvc.perform(get("/api/companies/999"))
+                .andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string("Company not found: 999"));
     }
@@ -175,6 +185,7 @@ class CompanyControllerTest {
         when(companyService.getAll()).thenReturn(List.of(company1, company2));
 
         mockMvc.perform(get("/api/companies"))
+                .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(2)))
                 .andExpect(jsonPath("$[0].id").value(1))
@@ -186,6 +197,7 @@ class CompanyControllerTest {
         when(companyService.getAll()).thenReturn(Collections.emptyList());
 
         mockMvc.perform(get("/api/companies"))
+                .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(0)));
     }
@@ -195,6 +207,7 @@ class CompanyControllerTest {
         doNothing().when(companyService).delete(1L);
 
         mockMvc.perform(delete("/api/companies/1"))
+                .andDo(print())
                 .andExpect(status().isNoContent());
 
         verify(companyService).delete(1L);
@@ -206,6 +219,7 @@ class CompanyControllerTest {
                 .when(companyService).delete(999L);
 
         mockMvc.perform(delete("/api/companies/999"))
+                .andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string("Company not found: 999"));
     }
@@ -220,6 +234,7 @@ class CompanyControllerTest {
         mockMvc.perform(post("/api/companies")
                         .contentType(MediaType.TEXT_PLAIN)
                         .content(objectMapper.writeValueAsString(input)))
+                .andDo(print())
                 .andExpect(status().isUnsupportedMediaType());
     }
 }

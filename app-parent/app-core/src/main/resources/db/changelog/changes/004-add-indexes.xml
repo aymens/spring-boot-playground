@@ -6,7 +6,7 @@
                         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
 
     <changeSet id="004.001-drop-if-exists" author="aimen.saihi">
-        <preConditions>
+        <preConditions onFail="MARK_RAN">
             <indexExists tableName="department" indexName="idx_department_name_upper"/>
         </preConditions>
         <dropIndex tableName="department" indexName="idx_department_name_upper"/>
@@ -49,7 +49,7 @@
     </changeSet>
 
     <changeSet id="004.003-drop-if-exists" author="aimen.saihi">
-        <preConditions>
+        <preConditions onFail="MARK_RAN">
             <indexExists tableName="company" indexName="idx_company_tax_id"/>
         </preConditions>
         <dropIndex tableName="company" indexName="idx_company_tax_id"/>

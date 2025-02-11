@@ -108,6 +108,6 @@ class FakerHelperTest {
                 )
         )
                 .isInstanceOf(BusinessException.class)
-                .hasMessageContaining("Couldn't generate a valid unique email for john.doe under 10 max attempts");
+                .hasMessageContaining("Couldn't generate a valid unique email for john.doe in less than 10 attempts");
     }
 }

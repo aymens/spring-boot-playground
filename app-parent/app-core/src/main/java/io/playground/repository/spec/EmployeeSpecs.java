@@ -1,11 +1,11 @@
 package io.playground.repository.spec;
 
+import io.playground.domain.Company_;
 import io.playground.domain.Department_;
 import io.playground.domain.Employee;
 import io.playground.domain.Employee_;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import lombok.experimental.UtilityClass;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.math.BigDecimal;
@@ -25,7 +25,7 @@ public final class EmployeeSpecs {
      *
      * @param since the date from which employees are to be filtered; can be null.
      * @return a {@link Specification} for filtering employees by hire date, or null
-     *         if the specified date is null.
+     * if the specified date is null.
      */
     public static Specification<Employee> hiredSince(Instant since) {
         return (root, _, cb) -> Optional.ofNullable(since)
@@ -41,9 +41,9 @@ public final class EmployeeSpecs {
      * @return a {@link Specification} to filter employees by department ID, or null if the departmentId is null.
      */
     public static Specification<Employee> inDepartment(Long departmentId) {
-        return (root, query, cb) ->
+        return (root, _, cb) ->
                 Optional.ofNullable(departmentId)
-                        .map(id -> cb.equal(root.get(Employee_.department).get(Department_.ID), id))
+                        .map(id -> cb.equal(root.get(Employee_.department).get(Department_.id), id))
                         .orElse(null);
 
     }
@@ -54,13 +54,30 @@ public final class EmployeeSpecs {
      *
      * @param minSalary the minimum salary to filter employees by. May be null, in which case no filter is applied.
      * @return a {@link Specification} for filtering employees with a salary greater than or equal to the specified value,
-     *         or null if the provided minimum salary is null.
+     * or null if the provided minimum salary is null.
      */
     public static Specification<Employee> withMinSalary(BigDecimal minSalary) {
         return (root, _, cb) -> Optional.ofNullable(minSalary)
                 .map(salary -> cb.greaterThanOrEqualTo(
                         root.get(Employee_.salary),
                         salary
+                ))
+                .orElse(null);
+    }
+
+    /**
+     * Creates a specification to filter {@link Employee} entities by their associated company ID.
+     * If the provided companyId is null, no filtering is applied.
+     *
+     * @param companyId the ID of the company to filter employees by. If null, no filtering is applied.
+     * @return a {@link Specification} to filter employees by the specified company ID,
+     * or null if the provided companyId is null.
+     */
+    public static Specification<Employee> inCompany(Long companyId) {
+        return (root, _, cb) -> Optional.ofNullable(companyId)
+                .map(id -> cb.equal(
+                        root.get(Employee_.department).get(Department_.company).get(Company_.id),
+                        id
                 ))
                 .orElse(null);
     }

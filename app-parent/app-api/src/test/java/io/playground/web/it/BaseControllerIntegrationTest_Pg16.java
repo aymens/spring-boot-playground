@@ -18,6 +18,8 @@ import java.time.Instant;
 import java.util.List;
 import java.util.stream.IntStream;
 
+import static io.playground.helper.NumberUtils.randomBigDecimal;
+
 public class BaseControllerIntegrationTest_Pg16 extends BaseMockMvcIntegrationTest_Pg16 {
 
     @Autowired
@@ -86,6 +88,7 @@ public class BaseControllerIntegrationTest_Pg16 extends BaseMockMvcIntegrationTe
                 .email(faker.internet().emailAddress())
                 .department(department)
                 .hireDate(Instant.now())
+                .salary(randomBigDecimal())
                 .build());
     }
 }

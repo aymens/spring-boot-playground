@@ -13,8 +13,10 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 
+import static io.playground.helper.NumberUtils.randomBigDecimal;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -33,11 +35,13 @@ class EmployeeControllerIT extends BaseControllerIntegrationTest_Pg16 {
                     .email("john.doe@example.com")
                     .departmentId(testDepartment.getId())
                     .hireDate(Instant.now())
+                    .salary(randomBigDecimal())
                     .build();
 
             MvcResult result = mockMvc.perform(post(BASE_URL)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(employeeIn)))
+                    .andDo(print())
                     .andExpect(status().isOk())
                     .andReturn();
 
@@ -69,11 +73,13 @@ class EmployeeControllerIT extends BaseControllerIntegrationTest_Pg16 {
                     .email("john.doe@example.com")
                     .departmentId(999L)
                     .hireDate(Instant.now())
+                    .salary(randomBigDecimal())
                     .build();
 
             mockMvc.perform(post(BASE_URL)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(employeeIn)))
+                    .andDo(print())
                     .andExpect(status().isNotFound())
                     .andExpect(result ->
                             assertThat(result.getResponse().getContentAsString())
@@ -90,6 +96,7 @@ class EmployeeControllerIT extends BaseControllerIntegrationTest_Pg16 {
                             .email("jane.smith@example.com")
                             .department(testDepartment)
                             .hireDate(Instant.now())
+                            .salary(randomBigDecimal())
                             .build()
             );
 
@@ -100,11 +107,13 @@ class EmployeeControllerIT extends BaseControllerIntegrationTest_Pg16 {
                     .email(existingEmployee.getEmail())
                     .departmentId(testDepartment.getId())
                     .hireDate(Instant.now())
+                    .salary(randomBigDecimal())
                     .build();
 
             mockMvc.perform(post(BASE_URL)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(employeeIn)))
+                    .andDo(print())
                     .andExpect(status().isBadRequest())
                     .andExpect(result ->
                             assertThat(result.getResponse().getContentAsString())
@@ -124,6 +133,7 @@ class EmployeeControllerIT extends BaseControllerIntegrationTest_Pg16 {
             mockMvc.perform(post(BASE_URL)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(employeeIn)))
+                    .andDo(print())
                     .andExpect(status().isBadRequest())
                     .andExpect(jsonPath("$.email").value("Invalid email format"));
         }
@@ -135,6 +145,7 @@ class EmployeeControllerIT extends BaseControllerIntegrationTest_Pg16 {
             mockMvc.perform(post(BASE_URL)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(employeeIn)))
+                    .andDo(print())
                     .andExpect(status().isBadRequest())
                     .andExpect(jsonPath("$.firstName").value("First name is required"))
                     .andExpect(jsonPath("$.lastName").value("Last name is required"))
@@ -156,6 +167,7 @@ class EmployeeControllerIT extends BaseControllerIntegrationTest_Pg16 {
             mockMvc.perform(post(BASE_URL)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(employeeIn)))
+                    .andDo(print())
                     .andExpect(status().isBadRequest())
                     .andExpect(jsonPath("$.hireDate").value("Hire date cannot be in the future"));
         }
@@ -172,10 +184,12 @@ class EmployeeControllerIT extends BaseControllerIntegrationTest_Pg16 {
                             .email("john.doe@example.com")
                             .department(testDepartment)
                             .hireDate(Instant.now())
+                            .salary(randomBigDecimal())
                             .build()
             );
 
             MvcResult result = mockMvc.perform(get(BASE_URL + "/{id}", employee.getId()))
+                    .andDo(print())
                     .andExpect(status().isOk())
                     .andReturn();
 
@@ -198,6 +212,7 @@ class EmployeeControllerIT extends BaseControllerIntegrationTest_Pg16 {
         @Test
         void getEmployee_WithInvalidId_ReturnsNotFound() throws Exception {
             mockMvc.perform(get(BASE_URL + "/{id}", 999L))
+                    .andDo(print())
                     .andExpect(status().isNotFound())
                     .andExpect(result ->
                             assertThat(result.getResponse().getContentAsString())
@@ -214,6 +229,7 @@ class EmployeeControllerIT extends BaseControllerIntegrationTest_Pg16 {
                             .email("john.doe@example.com")
                             .department(testDepartment)
                             .hireDate(Instant.now())
+                            .salary(randomBigDecimal())
                             .build()
             );
 
@@ -224,10 +240,12 @@ class EmployeeControllerIT extends BaseControllerIntegrationTest_Pg16 {
                             .email("jane.smith@example.com")
                             .department(testDepartment)
                             .hireDate(Instant.now())
+                            .salary(randomBigDecimal())
                             .build()
             );
 
             MvcResult result = mockMvc.perform(get(BASE_URL + "/department/{departmentId}", testDepartment.getId()))
+                    .andDo(print())
                     .andExpect(status().isOk())
                     .andReturn();
 
@@ -245,6 +263,7 @@ class EmployeeControllerIT extends BaseControllerIntegrationTest_Pg16 {
         @Test
         void getEmployees_WithInvalidDepartmentId_ReturnsBadRequest() throws Exception {
             mockMvc.perform(get(BASE_URL + "/department/{departmentId}", 999L))
+                    .andDo(print())
                     .andExpect(status().isBadRequest())
                     .andExpect(result ->
                             assertThat(result.getResponse().getContentAsString())
@@ -263,10 +282,12 @@ class EmployeeControllerIT extends BaseControllerIntegrationTest_Pg16 {
                             .email("john.doe@example.com")
                             .department(testDepartment)
                             .hireDate(Instant.now())
+                            .salary(randomBigDecimal())
                             .build()
             );
 
             mockMvc.perform(delete(BASE_URL + "/{id}", employee.getId()))
+                    .andDo(print())
                     .andExpect(status().isNoContent());
 
             assertThat(employeeRepository.existsById(employee.getId())).isFalse();
@@ -275,6 +296,7 @@ class EmployeeControllerIT extends BaseControllerIntegrationTest_Pg16 {
         @Test
         void deleteEmployee_WithInvalidId_ReturnsNotFound() throws Exception {
             mockMvc.perform(delete(BASE_URL + "/{id}", 999L))
+                    .andDo(print())
                     .andExpect(status().isNotFound())
                     .andExpect(result ->
                             assertThat(result.getResponse().getContentAsString())

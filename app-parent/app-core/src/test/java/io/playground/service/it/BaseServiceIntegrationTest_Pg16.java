@@ -16,6 +16,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.stream.IntStream;
 
+import static io.playground.helper.NumberUtils.randomBigDecimal;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 abstract class BaseServiceIntegrationTest_Pg16 extends BaseIntegrationTest_Pg16 {
@@ -87,6 +88,7 @@ abstract class BaseServiceIntegrationTest_Pg16 extends BaseIntegrationTest_Pg16 
                 .email(faker.internet().emailAddress())
                 .department(department)
                 .hireDate(Instant.now())
+                .salary(randomBigDecimal())
                 .build());
     }
 }

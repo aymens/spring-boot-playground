@@ -14,9 +14,11 @@ import org.springframework.test.web.servlet.MvcResult;
 import java.time.Instant;
 import java.util.List;
 
+import static io.playground.helper.NumberUtils.randomBigDecimal;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @Slf4j
@@ -36,6 +38,7 @@ class CompanyControllerIT extends BaseControllerIntegrationTest_Pg16 {
             MvcResult createResult = mockMvc.perform(post(BASE_URL)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(companyIn)))
+                    .andDo(print())
                     .andExpect(status().isCreated())
                     .andExpect(jsonPath("$.id").value(allOf(notNullValue(), greaterThan(0))))
                     .andExpect(jsonPath("$.name").value(companyIn.getName()))
@@ -75,6 +78,7 @@ class CompanyControllerIT extends BaseControllerIntegrationTest_Pg16 {
             mockMvc.perform(post(BASE_URL)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(input)))
+                    .andDo(print())
                     .andExpect(status().isBadRequest())
                     .andExpect(content().string("Company with tax ID already exists: " + duplicateTaxId));
         }
@@ -89,6 +93,7 @@ class CompanyControllerIT extends BaseControllerIntegrationTest_Pg16 {
             mockMvc.perform(post(BASE_URL)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(input)))
+                    .andDo(print())
                     .andExpect(status().isBadRequest())
                     .andExpect(jsonPath("$.name").value("Company name is required"))
                     .andExpect(jsonPath("$.taxId").value("Tax ID must be exactly 10 digits"));
@@ -104,6 +109,7 @@ class CompanyControllerIT extends BaseControllerIntegrationTest_Pg16 {
             mockMvc.perform(post(BASE_URL)
                             .contentType(MediaType.TEXT_PLAIN)
                             .content(objectMapper.writeValueAsString(input)))
+                    .andDo(print())
                     .andExpect(status().isUnsupportedMediaType());
         }
 
@@ -116,6 +122,7 @@ class CompanyControllerIT extends BaseControllerIntegrationTest_Pg16 {
         void getCompanies_WhenEmpty_ReturnsEmptyList() throws Exception {
             companyRepository.deleteAll();
             mockMvc.perform(get(BASE_URL))
+                    .andDo(print())
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$").isArray())
                     .andExpect(jsonPath("$", hasSize(0)));
@@ -130,6 +137,7 @@ class CompanyControllerIT extends BaseControllerIntegrationTest_Pg16 {
             ));
 
             mockMvc.perform(get(BASE_URL))
+                    .andDo(print())
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$").isArray())
                     .andExpect(jsonPath("$", hasSize(2)))
@@ -140,6 +148,7 @@ class CompanyControllerIT extends BaseControllerIntegrationTest_Pg16 {
         @Test
         void getCompany_WithNonexistentId_ReturnsNotFound() throws Exception {
             mockMvc.perform(get(BASE_URL + "/{id}", 999L))
+                    .andDo(print())
                     .andExpect(status().isNotFound())
                     .andExpect(content().string(
                             containsString("Company(999) not found")));
@@ -156,6 +165,7 @@ class CompanyControllerIT extends BaseControllerIntegrationTest_Pg16 {
                     .build());
 
             mockMvc.perform(delete(BASE_URL + "/{id}", company.getId()))
+                    .andDo(print())
                     .andExpect(status().isNoContent());
 
             assertThat(companyRepository.existsById(company.getId())).isFalse();
@@ -179,9 +189,11 @@ class CompanyControllerIT extends BaseControllerIntegrationTest_Pg16 {
                     .email("john@example.com")
                     .department(department)
                     .hireDate(Instant.now())
+                    .salary(randomBigDecimal())
                     .build());
 
             mockMvc.perform(delete(BASE_URL + "/{id}", company.getId()))
+                    .andDo(print())
                     .andExpect(status().isBadRequest())
                     .andExpect(content().string(containsString(
                             "Cannot delete company with existing employees")));
@@ -204,6 +216,7 @@ class CompanyControllerIT extends BaseControllerIntegrationTest_Pg16 {
                     .build());
 
             mockMvc.perform(delete(BASE_URL + "/{id}", company.getId()))
+                    .andDo(print())
                     .andExpect(status().isNoContent());
 
             assertThat(companyRepository.existsById(company.getId())).isFalse();
