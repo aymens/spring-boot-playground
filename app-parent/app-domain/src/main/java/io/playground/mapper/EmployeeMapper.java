@@ -16,6 +16,11 @@ public interface EmployeeMapper extends io.playground.mapper.Mapper<Employee, Em
     @Mapping(target = "departmentId", source = "department.id")
     EmployeeOut map(Employee employee);
 
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "department", ignore = true)
+    @Override
+    Employee map(EmployeeIn dto);
+
     @Mapping(target = "department", source = "department")
     @Mapping(target = "id", ignore = true)
     Employee map(@MappingTarget Employee employee, EmployeeIn employeeIn, Department department);

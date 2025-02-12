@@ -8,15 +8,23 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.lang.Nullable;
 
+import java.util.Optional;
+
 public interface DepartmentService extends DomainService<Department, Long, DepartmentRepository, DepartmentIn, DepartmentOut> {
 
     Page<DepartmentOut> getByCompanyId(Long companyId, Pageable pageable);
 
-    void delete(Long id,
-                @Nullable Long transferToDepartmentId);
+    void delete(Long id, @Nullable Long transferToDepartmentId);
 
     Page<DepartmentOut> find(Long companyId,
                              String nameFilter,
                              Integer minEmployees,
                              Pageable pageable);
+
+    Page<DepartmentOut> findByCompanyIdAndEmployeeCountBetween(Long companyId,
+                                                               int minEmployees,
+                                                               int maxEmployees,
+                                                               Pageable pageable);
+
+    Optional<DepartmentOut> findDepartmentWithMostRecentHire(Long companyId);
 }

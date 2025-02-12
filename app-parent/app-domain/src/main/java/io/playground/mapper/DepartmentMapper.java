@@ -16,6 +16,12 @@ public interface DepartmentMapper extends io.playground.mapper.Mapper<Department
     @Mapping(target = "companyId", source = "company.id")
     DepartmentOut map(Department department);
 
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "company", ignore = true)
+    @Mapping(target = "employees", ignore = true)
+    @Override
+    Department map(DepartmentIn in);
+
     @Mapping(target = "company", source = "company")
     @Mapping(target = "name", source = "department.name")
     @Mapping(target = "id", ignore = true) // Explicitly ignore ID

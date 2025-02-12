@@ -11,6 +11,8 @@ import io.playground.repository.CompanyRepository;
 import io.playground.service.CompanyService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -63,5 +65,23 @@ public class CompanyServiceImpl extends BaseDomainServiceImpl<Company, Long, Com
         log.info("Deleting company: {} ({})", company.getName(), id);
         companyRepository.deleteById(id);
         log.debug("Company deleted successfully: {}", id);
+    }
+//TODO test
+    @Override
+    public Page<CompanyOut> findCompaniesWithMinDepartments(int minDepartments, Pageable pageable) {
+        return companyRepository.findCompaniesWithMinDepartments(minDepartments, pageable)
+                .map(companyMapper::map);
+    }
+    //TODO test
+    @Override
+    public Page<CompanyOut> findCompaniesWithMinEmployees(int minEmployees, Pageable pageable) {
+        return companyRepository.findCompaniesWithMinEmployeesSpec(minEmployees, pageable)
+                .map(companyMapper::map);
+    }
+
+    @Override
+    public Page<CompanyOut> findCompaniesWithMinDepartmentsAndEmployees(int minDepartments, int minEmployees, Pageable pageable) {
+        return companyRepository.findCompaniesWithMinDepartmentsAndEmployees(minDepartments, minEmployees, pageable)
+                .map(companyMapper::map);
     }
 }

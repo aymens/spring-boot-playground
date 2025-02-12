@@ -20,8 +20,7 @@ import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 import static io.playground.repository.spec.DepartmentSpecs.*;
 
@@ -119,6 +118,25 @@ public class DepartmentServiceImpl extends BaseDomainServiceImpl<Department, Lon
                         .and(hasMinEmployees(minEmployees));
 
         return departmentRepository.findAll(spec, pageable)
+                .map(departmentMapper::map);
+    }
+    //TODO test
+    @Override
+    public Page<DepartmentOut> findByCompanyIdAndEmployeeCountBetween(Long companyId,
+                                                                      int minEmployees,
+                                                                      int maxEmployees,
+                                                                      Pageable pageable) {
+        return departmentRepository.findByCompanyIdAndEmployeeCountBetween(
+                        companyId,
+                        minEmployees,
+                        maxEmployees,
+                        pageable)
+                .map(departmentMapper::map);
+    }
+    //TODO test
+    @Override
+    public Optional<DepartmentOut> findDepartmentWithMostRecentHire(Long companyId) {
+        return departmentRepository.findDepartmentWithMostRecentHire(companyId)
                 .map(departmentMapper::map);
     }
 }

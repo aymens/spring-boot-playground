@@ -1,9 +1,10 @@
-package io.playground.service.it;
+package io.playground.it.service;
 
 import io.playground.domain.Department;
 import io.playground.domain.Employee;
 import io.playground.exception.BusinessException;
 import io.playground.exception.NotFoundException;
+import io.playground.it.BaseCoreIntegrationTest;
 import io.playground.model.EmployeeIn;
 import io.playground.model.EmployeeOut;
 import io.playground.service.EmployeeService;
@@ -22,14 +23,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @Slf4j
-class EmployeeServiceIT extends BaseServiceIntegrationTest_Pg16 {
+class EmployeeServiceIT extends BaseCoreIntegrationTest {
     @Autowired
     private EmployeeService employeeService;
 
     private Department testDepartment;
 
     @BeforeEach
-    void init() {
+    protected void init() {
         super.init();
         testDepartment = createTestDepartment(testCompany);
     }

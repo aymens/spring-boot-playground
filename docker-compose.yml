@@ -18,7 +18,8 @@ services:
     restart: unless-stopped
 
   db:
-    image: postgres:16
+    image: postgres:16-alpine
+#    image: postgres:16
     container_name: my_postgres
     environment:
       POSTGRES_USER: myuser

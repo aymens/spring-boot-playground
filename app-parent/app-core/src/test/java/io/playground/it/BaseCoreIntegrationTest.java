@@ -1,4 +1,4 @@
-package io.playground.service.it;
+package io.playground.it;
 
 import io.playground.domain.Company;
 import io.playground.domain.Department;
@@ -19,7 +19,7 @@ import java.util.stream.IntStream;
 import static io.playground.helper.NumberUtils.randomBigDecimal;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
-abstract class BaseServiceIntegrationTest_Pg16 extends BaseIntegrationTest_Pg16 {
+public abstract class BaseCoreIntegrationTest extends BaseIntegrationTest_Pg16 {
     @Autowired
     protected CompanyRepository companyRepository;
     @Autowired
@@ -35,17 +35,17 @@ abstract class BaseServiceIntegrationTest_Pg16 extends BaseIntegrationTest_Pg16 
      * Or, do not override this method! Instead, add your own @BeforeEach method with a different name.
      */
     @BeforeEach
-    void init() {
+    protected void init() {
         cleanup();
         testCompany = createTestCompany();
     }
 
     @AfterEach
-    void tearDown() {
+    protected void tearDown() {
         cleanup();
     }
 
-    void cleanup() {
+    protected void cleanup() {
         employeeRepository.deleteAll();
         departmentRepository.deleteAll();
         companyRepository.deleteAll();
