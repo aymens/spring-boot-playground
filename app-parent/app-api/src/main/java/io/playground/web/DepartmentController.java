@@ -16,8 +16,6 @@ import org.springframework.data.web.SortDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/api/departments")
 public class DepartmentController {
@@ -74,5 +72,25 @@ public class DepartmentController {
 
         Page<DepartmentOut> page = departmentService.find(companyId, nameFilter, minEmployees, pageable);
         return ResponseEntity.ok(page);
+    }
+
+    @Operation(summary = "Find departments by employee count range")
+    @GetMapping("/find/by-employee-count")
+    public ResponseEntity<Page<DepartmentOut>> findByEmployeeCountRange(
+            @RequestParam Long companyId,
+            @RequestParam int minEmployees,
+            @RequestParam int maxEmployees,
+            @ParameterObject Pageable pageable) {
+        return ResponseEntity.ok(departmentService.findByCompanyIdAndEmployeeCountBetween(
+                companyId, minEmployees, maxEmployees, pageable));
+    }
+
+    @Operation(summary = "Find department with most recent hire in a company")
+    @GetMapping("/find/most-recent-hire")
+    public ResponseEntity<DepartmentOut> findDepartmentWithMostRecentHire(
+            @RequestParam Long companyId) {
+        return departmentService.findDepartmentWithMostRecentHire(companyId)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 }

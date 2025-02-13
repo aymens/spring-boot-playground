@@ -17,9 +17,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.IntStream;
 
+import static io.playground.test.assertj.PageAssert.assertThatPage;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -274,6 +278,82 @@ class DepartmentServiceIT extends BaseCoreIntegrationTest {
                             department1.getName(),
                             department2.getName(),
                             department3.getName());
+        }
+
+        @Test
+        void findByCompanyIdAndEmployeeCountBetween_ReturnsExpectedDepartments() {
+            // Set up test data
+            Company company = createTestCompany();
+
+            Department dept1 = createTestDepartment(company);
+            IntStream.range(0, 5).forEach(_ -> createTestEmployee(dept1));
+
+            Department dept2 = createTestDepartment(company);
+            IntStream.range(0, 2).forEach(_ -> createTestEmployee(dept2));
+
+            Department dept3 = createTestDepartment(company);
+            IntStream.range(0, 4).forEach(_ -> createTestEmployee(dept3));
+
+            // Test with min=3 and max=5
+            Page<DepartmentOut> result = departmentService.findByCompanyIdAndEmployeeCountBetween(
+                    company.getId(), 3, 5, Pageable.unpaged());
+
+            assertThatPage(result)
+                    .isNotNull()
+                    .hasTotalElements(2)
+                    .extracting(DepartmentOut::getId)
+                    .containsExactlyInAnyOrder(dept1.getId(), dept3.getId());
+        }
+
+        @Test
+        void findDepartmentWithMostRecentHire_ReturnsDepartmentWithLatestHire() {
+            // Set up test data
+            Company company = createTestCompany();
+
+            Department dept1 = createTestDepartment(company);
+            Employee oldestHire = createTestEmployee(dept1);
+            oldestHire.setHireDate(Instant.now().minus(Duration.ofDays(30)));
+            employeeRepository.save(oldestHire);
+
+            Department dept2 = createTestDepartment(company);
+            Employee mostRecentHire = createTestEmployee(dept2);
+            mostRecentHire.setHireDate(Instant.now().minus(Duration.ofDays(1)));
+            employeeRepository.save(mostRecentHire);
+
+            // Test finding department with most recent hire
+            Optional<DepartmentOut> result = departmentService.findDepartmentWithMostRecentHire(company.getId());
+
+            assertThat(result)
+                    .isPresent()
+                    .get()
+                    .satisfies(department ->
+                            assertThat(department.getId()).isEqualTo(dept2.getId())
+                    );
+        }
+
+        @Test
+        void findDepartmentWithMostRecentHire_WhenNoEmployees_ReturnsEmpty() {
+            Company company = createTestCompany();
+            createTestDepartment(company);
+
+            Optional<DepartmentOut> result = departmentService.findDepartmentWithMostRecentHire(company.getId());
+
+            assertThat(result).isEmpty();
+        }
+
+        @Test
+        void findByCompanyIdAndEmployeeCountBetween_WhenNoMatch_ReturnsEmptyPage() {
+            Company company = createTestCompany();
+            Department dept = createTestDepartment(company);
+            IntStream.range(0, 2).forEach(_ -> createTestEmployee(dept)); // Less than min employees
+
+            Page<DepartmentOut> result = departmentService.findByCompanyIdAndEmployeeCountBetween(
+                    company.getId(), 3, 5, Pageable.unpaged());
+
+            assertThatPage(result)
+                    .isNotNull()
+                    .hasTotalElements(0)
+                    .hasNoContent();
         }
     }
 

@@ -22,7 +22,7 @@ import org.springframework.data.domain.Sort;
 import java.util.List;
 import java.util.stream.IntStream;
 
-import static io.playground.test.data.PageAssert.assertThatPage;
+import static io.playground.test.assertj.PageAssert.assertThatPage;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -107,7 +107,7 @@ class CompanyServiceIT extends BaseCoreIntegrationTest {
             CompanyOut created1 = companyService.create(createValidCompanyInput());
             CompanyOut created2 = companyService.create(createValidCompanyInput());
 
-            List<CompanyOut> results = companyService.getAll();
+            Page<CompanyOut> results = companyService.getAll(Pageable.unpaged());
 
             assertThat(results)
                     .hasSize(2)
@@ -135,7 +135,6 @@ class CompanyServiceIT extends BaseCoreIntegrationTest {
                     .hasSize(2)
                     .extracting(CompanyOut::getId)
                     .containsExactlyInAnyOrder(company1.getId(), company3.getId());
-            ;
         }
 
         @Test
@@ -190,9 +189,9 @@ class CompanyServiceIT extends BaseCoreIntegrationTest {
 
             );
 
-            assertThat(result)
+            assertThatPage(result)
                     .isNotNull()
-                    .hasSize(2)
+                    .hasTotalElements(2)
                     .extracting(CompanyOut::getId)
                     .containsExactly(company3.getId(), company1.getId());
         }
@@ -200,7 +199,7 @@ class CompanyServiceIT extends BaseCoreIntegrationTest {
         @Test
         void findCompaniesWithMinDepartmentsAndEmployees_WithPagination_ReturnsCorrectPage() {
             // Create several companies that meet the criteria
-            List<Company> companies = IntStream.range(0, 5)
+            IntStream.range(0, 5)
                     .mapToObj(_ -> {
                         Company company = createTestCompany();
                         List<Department> depts = createTestDepartments(company, 4);
@@ -210,17 +209,16 @@ class CompanyServiceIT extends BaseCoreIntegrationTest {
                     })
                     .toList();
 
-            // Test with pagination
+//            // Test with pagination
 //            Pageable pageable = PageRequest.of(1, 2, Sort.by("id").ascending());
-
+            // typesafe sort
             Pageable pageable =
                     PageRequest.of(
                             1,
                             2,
                             Sort.sort(Company.class)
                                     .by(Company::getId)
-                                    .ascending()
-                    );
+                                    .ascending());
 
             Page<CompanyOut> result = companyService.findCompaniesWithMinDepartmentsAndEmployees(
                     4, 12, pageable);
@@ -246,7 +244,7 @@ class CompanyServiceIT extends BaseCoreIntegrationTest {
 
             assertThatPage(result)
                     .isNotNull()
-                    .hasEmptyContent()
+                    .hasNoContent()
                     .hasTotalElements(0);
         }
     }

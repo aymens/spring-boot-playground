@@ -12,7 +12,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
 
+import java.time.Duration;
 import java.time.Instant;
+import java.util.stream.IntStream;
 
 import static io.playground.helper.NumberUtils.randomBigDecimal;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -644,6 +646,64 @@ class DepartmentControllerIT extends BaseControllerIntegrationTest_Pg16 {
 
             // Verify it's deleted by trying to get it
             mockMvc.perform(get(BASE_URL + "/{id}", created.getId()))
+                    .andDo(print())
+                    .andExpect(status().isNotFound());
+        }
+    }
+
+    @Nested
+    class DepartmentSearchOperations {
+        @Test
+        void findByEmployeeCountRange_ReturnsMatchingDepartments() throws Exception {
+            Company company = createTestCompany();
+
+            Department dept1 = createTestDepartment(company);
+            IntStream.range(0, 5).forEach(_ -> createTestEmployee(dept1));
+
+            Department dept2 = createTestDepartment(company);
+            IntStream.range(0, 2).forEach(_ -> createTestEmployee(dept2));
+
+            mockMvc.perform(get("/api/departments/find/by-employee-count")
+                            .param("companyId", company.getId().toString())
+                            .param("minEmployees", "4")
+                            .param("maxEmployees", "6")
+                            .param("page", "0")
+                            .param("size", "10"))
+                    .andDo(print())
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.content").isArray())
+                    .andExpect(jsonPath("$.content", hasSize(1)))
+                    .andExpect(jsonPath("$.content[0].id").value(dept1.getId()));
+        }
+
+        @Test
+        void findDepartmentWithMostRecentHire_ReturnsDepartment() throws Exception {
+            Company company = createTestCompany();
+
+            Department dept1 = createTestDepartment(company);
+            Employee oldHire = createTestEmployee(dept1);
+            oldHire.setHireDate(Instant.now().minus(Duration.ofDays(30)));
+            employeeRepository.save(oldHire);
+
+            Department dept2 = createTestDepartment(company);
+            Employee recentHire = createTestEmployee(dept2);
+            recentHire.setHireDate(Instant.now().minus(Duration.ofDays(1)));
+            employeeRepository.save(recentHire);
+
+            mockMvc.perform(get("/api/departments/find/most-recent-hire")
+                            .param("companyId", company.getId().toString()))
+                    .andDo(print())
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.id").value(dept2.getId()));
+        }
+
+        @Test
+        void findDepartmentWithMostRecentHire_WhenNoEmployees_ReturnsNotFound() throws Exception {
+            Company company = createTestCompany();
+            createTestDepartment(company);
+
+            mockMvc.perform(get("/api/departments/find/most-recent-hire")
+                            .param("companyId", company.getId().toString()))
                     .andDo(print())
                     .andExpect(status().isNotFound());
         }

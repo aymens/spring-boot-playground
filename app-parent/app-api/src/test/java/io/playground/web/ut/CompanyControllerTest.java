@@ -10,12 +10,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.Collections;
-import java.util.List;
-
+import static io.playground.test.data.PageUtils.pageOf;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -182,24 +181,24 @@ class CompanyControllerTest {
                 .id(2L)
                 .name("Other").build();
 
-        when(companyService.getAll()).thenReturn(List.of(company1, company2));
+        when(companyService.getAll(any())).thenReturn(pageOf(company1, company2));
 
         mockMvc.perform(get("/api/companies"))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(2)))
-                .andExpect(jsonPath("$[0].id").value(1))
-                .andExpect(jsonPath("$[1].id").value(2));
+                .andExpect(jsonPath("$.content", hasSize(2)))
+                .andExpect(jsonPath("$.content[0].id").value(1))
+                .andExpect(jsonPath("$.content[1].id").value(2));
     }
 
     @Test
     void getCompanies_WhenEmpty_ReturnsList() throws Exception {
-        when(companyService.getAll()).thenReturn(Collections.emptyList());
+        when(companyService.getAll(any())).thenReturn(Page.empty());
 
         mockMvc.perform(get("/api/companies"))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(0)));
+                .andExpect(jsonPath("$.content", hasSize(0)));
     }
 
     @Test

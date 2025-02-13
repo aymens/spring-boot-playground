@@ -3,9 +3,9 @@ package io.playground.service;
 import io.playground.domain.Domain;
 import io.playground.mapper.Mapper;
 import io.playground.model.Dto;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
-
-import java.util.List;
 
 /**
  * The DomainService interface provides a generic contract for managing domain entities,
@@ -26,7 +26,7 @@ public interface DomainService<Ety extends Domain, ID, REPO extends JpaRepositor
 
     boolean exists(ID id);
 
-    List<OuDto> getAll();
+    Page<OuDto> getAll(Pageable pageable);
 
     void delete(ID id);
 

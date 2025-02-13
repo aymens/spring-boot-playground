@@ -13,6 +13,7 @@ import org.springframework.test.web.servlet.MvcResult;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.stream.IntStream;
 
 import static io.playground.helper.NumberUtils.randomBigDecimal;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -124,8 +125,8 @@ class CompanyControllerIT extends BaseControllerIntegrationTest_Pg16 {
             mockMvc.perform(get(BASE_URL))
                     .andDo(print())
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$").isArray())
-                    .andExpect(jsonPath("$", hasSize(0)));
+                    .andExpect(jsonPath("$.content").isArray())
+                    .andExpect(jsonPath("$.content", hasSize(0)));
         }
 
         @Test
@@ -139,10 +140,10 @@ class CompanyControllerIT extends BaseControllerIntegrationTest_Pg16 {
             mockMvc.perform(get(BASE_URL))
                     .andDo(print())
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$").isArray())
-                    .andExpect(jsonPath("$", hasSize(2)))
-                    .andExpect(jsonPath("$[0].name").value("First Corp"))
-                    .andExpect(jsonPath("$[1].name").value("Second Corp"));
+                    .andExpect(jsonPath("$.content").isArray())
+                    .andExpect(jsonPath("$.content", hasSize(2)))
+                    .andExpect(jsonPath("$.content[0].name").value("First Corp"))
+                    .andExpect(jsonPath("$.content[1].name").value("Second Corp"));
         }
 
         @Test
@@ -221,6 +222,98 @@ class CompanyControllerIT extends BaseControllerIntegrationTest_Pg16 {
 
             assertThat(companyRepository.existsById(company.getId())).isFalse();
             assertThat(departmentRepository.existsById(department.getId())).isFalse();
+        }
+    }
+
+    @Nested
+    class FindCompanies {
+        @Test
+        void whenBothCriteriaProvided_ReturnsMatchingCompanies() throws Exception {
+            Company company = createTestCompany();
+            List<Department> departments = createTestDepartments(company, 4);
+            departments.forEach(dept ->
+                    IntStream.range(0, 4).forEach(_ -> createTestEmployee(dept)));
+
+            mockMvc.perform(get("/api/companies/find")
+                            .param("minDepartments", "3")
+                            .param("minEmployees", "10")
+                            .param("page", "0")
+                            .param("size", "10"))
+                    .andDo(print())
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.content", hasSize(1)))
+                    .andExpect(jsonPath("$.content[0].id").value(company.getId()));
+        }
+
+        @Test
+        void whenOnlyMinDepartments_ReturnsMatchingCompanies() throws Exception {
+            Company company1 = createTestCompany();
+            createTestDepartments(company1, 5);
+
+            Company company2 = createTestCompany();
+            createTestDepartments(company2, 2);
+
+            mockMvc.perform(get("/api/companies/find")
+                            .param("minDepartments", "4")
+                            .param("page", "0")
+                            .param("size", "10"))
+                    .andDo(print())
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.content", hasSize(1)))
+                    .andExpect(jsonPath("$.content[0].id").value(company1.getId()));
+        }
+
+        @Test
+        void whenOnlyMinEmployees_ReturnsMatchingCompanies() throws Exception {
+            Company company1 = createTestCompany();
+            Department dept1 = createTestDepartment(company1);
+            IntStream.range(0, 5).forEach(_ -> createTestEmployee(dept1));
+
+            Company company2 = createTestCompany();
+            Department dept2 = createTestDepartment(company2);
+            IntStream.range(0, 2).forEach(_ -> createTestEmployee(dept2));
+
+            mockMvc.perform(get("/api/companies/find")
+                            .param("minEmployees", "4")
+                            .param("page", "0")
+                            .param("size", "10"))
+                    .andDo(print())
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.content", hasSize(1)))
+                    .andExpect(jsonPath("$.content[0].id").value(company1.getId()));
+        }
+
+        @Test
+        void whenNoCriteria_ReturnsAllCompanies() throws Exception {
+            companyRepository.deleteAll();
+            Company company1 = createTestCompany();
+            Company company2 = createTestCompany();
+
+            mockMvc.perform(get("/api/companies/find")
+                            .param("page", "0")
+                            .param("size", "10"))
+                    .andDo(print())
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.content", hasSize(2)))
+                    .andExpect(jsonPath("$.content[*].id", containsInAnyOrder(
+                            company1.getId().intValue(),
+                            company2.getId().intValue()
+                    )));
+        }
+
+        @Test
+        void whenNoResults_ReturnsEmptyPage() throws Exception {
+            companyRepository.deleteAll();
+            mockMvc.perform(get("/api/companies/find")
+                            .param("minDepartments", "1")
+                            .param("minEmployees", "1")
+                            .param("page", "0")
+                            .param("size", "10"))
+                    .andDo(print())
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.content", hasSize(0)))
+                    .andExpect(jsonPath("$.page").exists())
+                    .andExpect(jsonPath("$.page.totalElements").value(0));
         }
     }
 }
