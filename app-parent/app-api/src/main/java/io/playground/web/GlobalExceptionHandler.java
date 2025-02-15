@@ -9,6 +9,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.util.Map;
 import java.util.Optional;
@@ -19,6 +20,16 @@ import static org.springframework.http.ResponseEntity.status;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<Map<String, String>> handleMethodArgumentTypeMismatch(MethodArgumentTypeMismatchException e) {
+        String paramName = e.getName();
+        String message = switch (paramName) {
+            case String s when s.toLowerCase().matches(".*date.*") -> "Invalid date format. Use: yyyy-MM-dd, yyyy-MM-dd HH, or yyyy-MM-dd HH:mm";
+            default -> e.getMessage();
+        };
+        return badRequest().body(Map.of(paramName, message));
+    }
 
     @ExceptionHandler(NotFoundException.class)
     public ResponseEntity<String> handleBusinessException(NotFoundException e) {

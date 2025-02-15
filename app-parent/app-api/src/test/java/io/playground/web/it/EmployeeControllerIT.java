@@ -10,11 +10,17 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
 
+import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 
 import static io.playground.helper.NumberUtils.randomBigDecimal;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -89,16 +95,7 @@ class EmployeeControllerIT extends BaseControllerIntegrationTest_Pg16 {
         @Test
         void createEmployee_WithDuplicateEmail_ReturnsBadRequest() throws Exception {
             // First create an employee
-            Employee existingEmployee = employeeRepository.save(
-                    Employee.builder()
-                            .firstName("Jane")
-                            .lastName("Smith")
-                            .email("jane.smith@example.com")
-                            .department(testDepartment)
-                            .hireDate(Instant.now())
-                            .salary(randomBigDecimal())
-                            .build()
-            );
+            Employee existingEmployee = createTestEmployee(testDepartment);
 
             // Try to create another with same email
             EmployeeIn employeeIn = EmployeeIn.builder()
@@ -177,16 +174,7 @@ class EmployeeControllerIT extends BaseControllerIntegrationTest_Pg16 {
     class Get {
         @Test
         void getEmployee_WithValidId_ReturnsEmployee() throws Exception {
-            Employee employee = employeeRepository.save(
-                    Employee.builder()
-                            .firstName("John")
-                            .lastName("Doe")
-                            .email("john.doe@example.com")
-                            .department(testDepartment)
-                            .hireDate(Instant.now())
-                            .salary(randomBigDecimal())
-                            .build()
-            );
+            Employee employee = createTestEmployee(testDepartment);
 
             MvcResult result = mockMvc.perform(get(BASE_URL + "/{id}", employee.getId()))
                     .andDo(print())
@@ -222,27 +210,8 @@ class EmployeeControllerIT extends BaseControllerIntegrationTest_Pg16 {
         @Test
         void getEmployees_ByDepartmentId_ReturnsList() throws Exception {
             // Create multiple employees in the department
-            employeeRepository.save(
-                    Employee.builder()
-                            .firstName("John")
-                            .lastName("Doe")
-                            .email("john.doe@example.com")
-                            .department(testDepartment)
-                            .hireDate(Instant.now())
-                            .salary(randomBigDecimal())
-                            .build()
-            );
-
-            employeeRepository.save(
-                    Employee.builder()
-                            .firstName("Jane")
-                            .lastName("Smith")
-                            .email("jane.smith@example.com")
-                            .department(testDepartment)
-                            .hireDate(Instant.now())
-                            .salary(randomBigDecimal())
-                            .build()
-            );
+            createTestEmployee(testDepartment);
+            createTestEmployee(testDepartment);
 
             MvcResult result = mockMvc.perform(get(BASE_URL + "/department/{departmentId}", testDepartment.getId()))
                     .andDo(print())
@@ -270,6 +239,49 @@ class EmployeeControllerIT extends BaseControllerIntegrationTest_Pg16 {
                     .andExpect(result ->
                             assertThat(result.getResponse().getContentAsString())
                                     .contains("Department not found: 999"));
+        }
+
+        @Test
+        void findEmployees_WithValidParams_ShouldReturnFilteredResults() throws Exception {
+            Employee employee1 = createTestEmployee(testDepartment);
+            Employee employee2 = createTestEmployee(testDepartment);
+
+            Instant minHireDate = employee1.getHireDate().isBefore(employee2.getHireDate()) ? employee1.getHireDate() : employee2.getHireDate();
+            BigDecimal minSalary = employee1.getSalary().min(employee2.getSalary());
+
+            mockMvc.perform(get("/api/employees/find")
+                            .param("departmentId", testDepartment.getId().toString())
+                            .param("hireDate", LocalDateTime.ofInstant(minHireDate, ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern("yyyy-MM-dd")))
+                            .param("minSalary", minSalary.toString())
+                            .param("size", "10"))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.content", hasSize(2)))
+                    .andExpect(jsonPath("$.content[0].firstName").value(equalTo(employee1.getFirstName())))
+                    .andExpect(jsonPath("$.content[0].lastName").value(equalTo(employee1.getLastName())))
+                    .andExpect(jsonPath("$.content[0].salary").value(equalTo(employee1.getSalary().doubleValue())))
+                    .andExpect(jsonPath("$.content[1].firstName").value(equalTo(employee2.getFirstName())))
+                    .andExpect(jsonPath("$.content[1].lastName").value(equalTo(employee2.getLastName())))
+                    .andExpect(jsonPath("$.content[1].salary").value(equalTo(employee2.getSalary().doubleValue())));
+        }
+
+        @Test
+        void findEmployees_WithoutParams_ShouldReturnAllEmployees() throws Exception {
+            Employee employee1 = createTestEmployee(testDepartment);
+            Employee employee2 = createTestEmployee(testDepartment);
+
+            mockMvc.perform(get("/api/employees/find")
+                            .param("size", "10"))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.content", hasSize(2)))
+                    .andExpect(jsonPath("$.content[0].firstName").value(employee1.getFirstName()))
+                    .andExpect(jsonPath("$.content[1].firstName").value(employee2.getFirstName()));
+        }
+
+        @Test
+        void findEmployees_WithInvalidDateFormat_ShouldReturnBadRequest() throws Exception {
+            mockMvc.perform(get("/api/employees/find")
+                            .param("hireDate", "invalid-date"))
+                    .andExpect(status().isBadRequest());
         }
     }
 

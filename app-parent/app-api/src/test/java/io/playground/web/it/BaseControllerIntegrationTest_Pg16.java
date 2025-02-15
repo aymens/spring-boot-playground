@@ -14,11 +14,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.time.Instant;
 import java.util.List;
 import java.util.stream.IntStream;
 
 import static io.playground.helper.NumberUtils.randomBigDecimal;
+import static java.util.concurrent.TimeUnit.DAYS;
 
 public class BaseControllerIntegrationTest_Pg16 extends BaseMockMvcIntegrationTest_Pg16 {
 
@@ -87,7 +87,7 @@ public class BaseControllerIntegrationTest_Pg16 extends BaseMockMvcIntegrationTe
                 .lastName(faker.name().lastName())
                 .email(faker.internet().emailAddress())
                 .department(department)
-                .hireDate(Instant.now())
+                .hireDate(faker.timeAndDate().past(1000, DAYS))
                 .salary(randomBigDecimal())
                 .build());
     }

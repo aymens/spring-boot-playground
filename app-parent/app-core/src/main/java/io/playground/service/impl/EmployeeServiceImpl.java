@@ -10,12 +10,17 @@ import io.playground.model.EmployeeIn;
 import io.playground.model.EmployeeOut;
 import io.playground.repository.DepartmentRepository;
 import io.playground.repository.EmployeeRepository;
+import io.playground.repository.spec.EmployeeSpecs;
 import io.playground.service.EmployeeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
+import java.time.Instant;
 
 @Transactional
 @Service
@@ -58,6 +63,19 @@ public class EmployeeServiceImpl extends BaseDomainServiceImpl<Employee, Long, E
             throw new BusinessException("Department not found: " + departmentId);
         }
         return employeeRepository.findByDepartmentId(departmentId, pageable)
+                .map(employeeMapper::map);
+    }
+
+    @Override
+    public Page<EmployeeOut> findByDepartmentIdHireDateMinSalary(Long departmentId,
+                                                                 Instant hireDate,
+                                                                 BigDecimal minSalary,
+                                                                 Pageable pageable) {
+        return employeeRepository.findAll(
+                Specification.where(EmployeeSpecs.inDepartment(departmentId)
+                        .and(EmployeeSpecs.hiredSince(hireDate)
+                                .and(EmployeeSpecs.withMinSalary(minSalary)))),
+                pageable)
                 .map(employeeMapper::map);
     }
 }

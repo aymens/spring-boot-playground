@@ -36,6 +36,7 @@ import java.util.regex.Pattern;
 import java.util.stream.IntStream;
 import java.util.stream.LongStream;
 
+import static io.playground.helper.NumberUtils.randomBigDecimal;
 import static java.lang.Long.parseLong;
 import static java.util.Objects.requireNonNullElse;
 
@@ -163,6 +164,7 @@ public class DataGeneratorController {
                             .email(email)
                             .departmentId(departmentId)
                             .hireDate(generateRandomPastDate())
+                            .salary(randomBigDecimal())
                             .build();
                     employeeService.create(employee);
                 });
