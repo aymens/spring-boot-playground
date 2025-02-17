@@ -15,6 +15,7 @@
  */
 package io.playground._sandbox;
 
+import io.playground.configuration.security.EnableSecurity;
 import lombok.val;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -49,6 +50,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
         HibernateJpaAutoConfiguration.class,
         LiquibaseAutoConfiguration.class
 })
+@EnableSecurity
 public class GreetingControllerIT {
 
     @Autowired
@@ -59,7 +61,7 @@ public class GreetingControllerIT {
 
     @Test
     public void getGreeting_WithoutParam_ReturnsDefaultMessage() {
-        val response = template.getForEntity("/api/v1/greeting", String.class);
+        val response = template.getForEntity("/api/public/v1/greeting", String.class);
 
         // Print the response body
         System.out.println(response.getBody());
@@ -73,7 +75,7 @@ public class GreetingControllerIT {
     @Test
     public void getGreeting_WithNameParam_ReturnsTailoredMessage() {
         val response = template.getForEntity(
-                UriComponentsBuilder.fromPath("/api/v1/greeting")
+                UriComponentsBuilder.fromPath("/api/public/v1/greeting")
                         .queryParam("name", "{name}")
                         .buildAndExpand("Spring Community")
                         .toUriString(),
@@ -88,16 +90,17 @@ public class GreetingControllerIT {
                 .isEqualTo("Hello, Spring Community!");
     }
 
-    @Test @Disabled
+    @Test
+    @Disabled
     public void getDebug_WithEncodedUri_ValidatesEncoding() {
         // Direct approach
-        String directUri = UriComponentsBuilder.fromPath("/api/v1/greeting")
+        String directUri = UriComponentsBuilder.fromPath("/api/public/v1/greeting")
                 .queryParam("name", "Spring Community")
                 .toUriString();
         System.out.println("Direct URI: " + directUri);
 
         // Template approach
-        String templateUri = UriComponentsBuilder.fromPath("/api/v1/greeting")
+        String templateUri = UriComponentsBuilder.fromPath("/api/public/v1/greeting")
                 .queryParam("name", "{name}")
                 .buildAndExpand("Spring Community")
                 .toUriString();
@@ -111,13 +114,14 @@ public class GreetingControllerIT {
         System.out.println("Template approach response: " + response2.getBody());
     }
 
-    @Test @Disabled
+    @Test
+    @Disabled
     public void getDebug_WithDifferentEncodings_ComparesResults() {
         // Original string
         String value = "Spring Community";
 
         // UriComponentsBuilder encoding
-        String uriBuilderEncoded = UriComponentsBuilder.fromPath("/api/v1/greeting")
+        String uriBuilderEncoded = UriComponentsBuilder.fromPath("/api/public/v1/greeting")
                 .queryParam("name", value)
                 .toUriString();
         System.out.println("UriBuilder encoded: " + uriBuilderEncoded);
@@ -125,25 +129,26 @@ public class GreetingControllerIT {
         // TestRestTemplate will use RestTemplate's UriTemplateHandler
         // We can get it directly:
         DefaultUriBuilderFactory uriFactory = new DefaultUriBuilderFactory();
-        String templateEncoded = uriFactory.expand("/api/v1/greeting?name={name}", value)
+        String templateEncoded = uriFactory.expand("/api/public/v1/greeting?name={name}", value)
                 .toString();
         System.out.println("TestRestTemplate would encode to: " + templateEncoded);
     }
 
-    @Test @Disabled
+    @Test
+    @Disabled
     public void getDebug_WithQueryParams_ValidatesResolution() {
         // Direct approach
-        String directUri = UriComponentsBuilder.fromPath("/api/v1/debug")
+        String directUri = UriComponentsBuilder.fromPath("/api/public/v1/debug")
                 .queryParam("name", "Spring Community")
                 .toUriString();
-        System.out.println("directUri: "+directUri);
+        System.out.println("directUri: " + directUri);
 
         // Template approach
-        String templateUri = UriComponentsBuilder.fromPath("/api/v1/debug")
+        String templateUri = UriComponentsBuilder.fromPath("/api/public/v1/debug")
                 .queryParam("name", "{name}")
                 .buildAndExpand("Spring Community")
                 .toUriString();
-        System.out.println("templateUri: "+templateUri);
+        System.out.println("templateUri: " + templateUri);
 
         // Call debug endpoint with both approaches
         val directResponse = template.getForEntity(directUri, Map.class);
@@ -155,10 +160,11 @@ public class GreetingControllerIT {
         System.out.println(templateResponse.getBody());
     }
 
-    @Test @Disabled
+    @Test
+    @Disabled
     public void investigateDoubleEncoding() {
         // Direct approach
-        String directUri = UriComponentsBuilder.fromPath("/api/v1/debug")
+        String directUri = UriComponentsBuilder.fromPath("/api/public/v1/debug")
                 .queryParam("name", "Spring Community")
                 .toUriString();
         System.out.println("Direct URI initial: " + directUri);

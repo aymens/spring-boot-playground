@@ -5,6 +5,7 @@ import io.playground.domain.Department;
 import io.playground.domain.Employee;
 import io.playground.model.CompanyIn;
 import io.playground.model.CompanyOut;
+import io.playground.test.security.annotations.WithMockJwtAuth;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -22,6 +23,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+@WithMockJwtAuth(roles = {"ROLE_app_user"})
 @Slf4j
 class CompanyControllerIT extends BaseControllerIntegrationTest_Pg16 {
 

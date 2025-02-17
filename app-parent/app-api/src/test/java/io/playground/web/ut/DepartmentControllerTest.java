@@ -1,10 +1,12 @@
 package io.playground.web.ut;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.playground.configuration.security.EnableSecurity;
 import io.playground.exception.BusinessException;
 import io.playground.model.DepartmentIn;
 import io.playground.model.DepartmentOut;
 import io.playground.service.DepartmentService;
+import io.playground.test.security.annotations.WithMockJwtAuth;
 import io.playground.web.DepartmentController;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +25,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(DepartmentController.class)
+@EnableSecurity
+@WithMockJwtAuth(roles = {"ROLE_app_user"})
 class DepartmentControllerTest {
     @Autowired
     private MockMvc mockMvc;

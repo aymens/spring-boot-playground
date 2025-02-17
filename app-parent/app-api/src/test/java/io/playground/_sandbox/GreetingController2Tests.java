@@ -15,6 +15,7 @@
  */
 package io.playground._sandbox;
 
+import io.playground.configuration.security.EnableSecurity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(GreetingController.class)
+@EnableSecurity
 public class GreetingController2Tests {
 
     @Autowired
@@ -47,7 +49,7 @@ public class GreetingController2Tests {
 
     @Test
     public void getGreeting_WithoutParam_ReturnsDefaultMessage() throws Exception {
-        this.mockMvc.perform(get("/api/v1/greeting"))
+        this.mockMvc.perform(get("/api/public/v1/greeting"))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content").value("Hello, World!"));
@@ -55,7 +57,7 @@ public class GreetingController2Tests {
 
     @Test
     public void getGreeting_WithNameParam_ReturnsTailoredMessage() throws Exception {
-        this.mockMvc.perform(get("/api/v1/greeting").param("name", "Spring Community"))
+        this.mockMvc.perform(get("/api/public/v1/greeting").param("name", "Spring Community"))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content").value("Hello, Spring Community!"));

@@ -17,13 +17,13 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
 
-@RequestMapping("api")
+@RequestMapping("/api/public")
 @RestController
 @ConditionalOnProperty(
         prefix = "playground.api.rest",
         name = "sandbox.enabled",
-        havingValue = "true",
-        matchIfMissing = false)
+        havingValue = "true"
+)
 public class GreetingController {
 
     private final SomeService someService;
@@ -54,6 +54,7 @@ public class GreetingController {
     //TODO PROBLEM
 
     @GetMapping("v2/greeting")
+    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     public ResponseEntity<Greeting> greetingV2(
             @RequestParam(value = "name", required = false) Optional<String> nameOptional) {
         return nameOptional
@@ -82,7 +83,7 @@ public class GreetingController {
         try {
             System.out.println("Flux definition start");
             Flux<Greeting> greetings = Flux.range(1, count)
-                    .doOnSubscribe(subscription -> System.out.println(subscription))
+                    .doOnSubscribe(System.out::println)
                     .map(i -> {
                                 System.out.println("Creating greeting " + i);
                                 return new Greeting(
@@ -90,9 +91,9 @@ public class GreetingController {
                                         String.format(template, "User" + i));
                             }
                     )
+                    // Simulating a delay for streaming
                     .delayElements(Duration.ofMillis(1000))
                     .doOnNext(g -> System.out.println("Emitted greeting " + g.id()));
-            ; // Simulating a delay for streaming
             System.out.println("Flux definition done");
 
             return Mono.just(ResponseEntity.ok(greetings));

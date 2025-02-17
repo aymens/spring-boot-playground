@@ -25,6 +25,7 @@ import lombok.val;
 import net.datafaker.Faker;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -42,11 +43,12 @@ import static java.lang.Long.parseLong;
 import static java.util.Objects.requireNonNullElse;
 
 @RestController
-@RequestMapping("/api/data-gen")
+@RequestMapping("api/data-gen")
 @ConditionalOnDataGeneratorEnabled
 @Slf4j
 @RequiredArgsConstructor
 @Transactional
+@PreAuthorize("hasAnyRole('ROLE_app_user', 'ROLE_app_admin')")
 public class DataGeneratorController {
 
     private static final Pattern IDS_PATTERN = Pattern.compile("(\\d+)(?:-(\\d+))?");
