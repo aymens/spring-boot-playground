@@ -15,6 +15,7 @@ import io.playground.repository.EmployeeRepository;
 import io.playground.service.CompanyService;
 import io.playground.service.DepartmentService;
 import io.playground.service.EmployeeService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -80,8 +81,13 @@ public class DataGeneratorController {
     }
 
     @PostMapping("/companies/{companyId}/departments")
-    public ResponseEntity<Company> addDepartmentToCompany(@PathVariable Long companyId,
-                                                          @RequestParam(defaultValue = "5") int numEmployees) {
+    @Operation(summary = "Add a department to a company",
+            description = "Adds a new department to the specified company and generates employees for it.")
+    public ResponseEntity<Company> addDepartmentToCompany(
+            @Parameter(description = "The ID of the company to add the department to", required = true)
+            @PathVariable Long companyId,
+            @Parameter(description = "The number of employees to generate for the new department", example = "5")
+            @RequestParam(defaultValue = "5") int numEmployees) {
         var department = generateDepartment(companyId);
         generateEmployees(department.getId(), numEmployees);
         return ResponseEntity.ok(getCompanyEagerly(companyId));

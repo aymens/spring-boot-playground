@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties(prefix = "playground.api.rest")
 @Getter
 @Setter
-public class ControllersEnablers {
+public class ControllersEnablersProperties {
     @Getter
     @Setter
     public static class Controller {

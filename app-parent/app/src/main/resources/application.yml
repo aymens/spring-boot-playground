@@ -3,10 +3,27 @@ server:
   address: ${SERVER_ADDRESS:0.0.0.0}
 
 spring:
+  application:
+    name: ${SPRING_APPLICATION_NAME:spring-boot-playground}
+  output:
+    ansi:
+      enabled: ALWAYS
+
+  security:
+    oauth2:
+      authorizationserver:
+        endpoint:
+          authorization-uri: ${OAUTH2_AUTHORIZATION_URI:http://localhost:8082/realms/playground-realm/protocol/openid-connect/auth}
+          token-uri: ${OAUTH2_TOKEN_URI:http://localhost:8082/realms/playground-realm/protocol/openid-connect/token}
+      resourceserver:
+        jwt:
+          issuer-uri: ${OAUTH2_JWT_ISSUER_URI:http://localhost:8082/realms/playground-realm}
+          jwk-set-uri: ${OAUTH2_JWK_SET_URI:http://localhost:8082/realms/playground-realm/protocol/openid-connect/certs}
+
   data:
     web:
       pageable:
-        default-page-size: 20
+        default-page-size: 10
         max-page-size: 2000
         one-indexed-parameters: false  # true for 1-based page numbers
         page-parameter: page
@@ -14,12 +31,6 @@ spring:
         prefix: ""  # for prefix like "x.page" instead of "page"
       sort:
         sort-parameter: sort
-
-  output:
-    ansi:
-      enabled: ALWAYS
-  application:
-    name: ${SPRING_APPLICATION_NAME:spring-boot-playground}
 
   boot:
     admin:
@@ -34,40 +45,29 @@ spring:
               version: @project.version@
               application-type: rest-api
 
-
   datasource:
     url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/sandbox-rest-app}
     username: ${SPRING_DATASOURCE_USERNAME:sandbox-rest-app-user}
     password: ${SPRING_DATASOURCE_PASSWORD:sandbox-rest-app-user-pwd}
     driver-class-name: ${SPRING_DATASOURCE_DRIVER_CLASS_NAME:org.postgresql.Driver}
-#    hikari:
-#      connection-test-query: SELECT 1
-#      connection-timeout:
-#      idle-timeout:
-#      keepalive-time:
-#      validation-timeout:
-#      max-lifetime:
 
   jpa:
     show-sql: ${SPRING_JPA_SHOW_SQL:true}    # Helpful during development to see the SQL
     generate-ddl: ${SPRING_JPA_GENERATE_DDL:false} # We want Liquibase, not Hibernate, to manage our schema
-#    properties:
-#      hibernate:
-#        format_sql: true
-        # Show values in queries instead of ?
-#        type: trace
-#    hibernate:
-#      ddl-auto: none  # We want Liquibase, not Hibernate, to manage our schema
-#    database-platform: org.hibernate.dialect.PostgreSQLDialect
+
   liquibase:
 #    change-log: classpath:db/changelog/db.changelog-master.yaml
     change-log: ${SPRING_LIQUIBASE_CHANGE_LOG:classpath:db/changelog/db.changelog-master.xml}
     enabled: ${SPRING_LIQUIBASE_ENABLED:true}
 
 springdoc:
-  swagger-ui:
-    path: ${SWAGGER_UI_PATH:/swagger-ui.html}
   show-actuator: ${SHOW_ACTUATOR:true}
+  swagger-ui:
+    try-it-out-enabled: true
+    path: ${SWAGGER_UI_PATH:/swagger-ui.html}
+    oauth:
+      client-id: ${SWAGGER_CLIENT_ID:playground-swagger-ui-client}
+      scopes: ${SWAGGER_CLIENT_SCOPES:openid,profile}
 
 playground:
   api:
