@@ -15,7 +15,7 @@
  */
 package io.playground._sandbox;
 
-import io.playground.configuration.security.EnableSecurity;
+import io.playground.test.configuration.security.annotations.DisableSecurity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(GreetingController.class)
-@EnableSecurity
+@DisableSecurity
 public class GreetingController2Tests {
 
     @Autowired

@@ -8,6 +8,11 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * Helpful for controller test classes that aren't loading complete spring boot test contexts.
+ * <p></p>
+ * Helps loading "app" security config, avoiding this way the unwanted defaults from kicking in.
+ */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Import({
