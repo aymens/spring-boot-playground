@@ -1,5 +1,6 @@
 package io.playground.web;
 
+import io.playground.configuration.security.permissions.CanEditCompanies;
 import io.playground.model.CompanyIn;
 import io.playground.model.CompanyOut;
 import io.playground.service.CompanyService;
@@ -12,7 +13,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,7 +21,7 @@ import java.util.Optional;
 @RestController
 @RequestMapping("api/companies")
 @Transactional
-@PreAuthorize("hasAnyRole('ROLE_app_user', 'ROLE_app_admin')")
+@CanEditCompanies
 public class CompanyController {
 
     private final CompanyService companyService;

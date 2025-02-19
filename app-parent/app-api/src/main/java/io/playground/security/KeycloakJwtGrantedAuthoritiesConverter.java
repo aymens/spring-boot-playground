@@ -1,4 +1,4 @@
-package io.playground.configuration.security;
+package io.playground.security;
 
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.lang.Nullable;

@@ -1,5 +1,6 @@
 package io.playground.web;
 
+import io.playground.configuration.security.permissions.CanEditCompanies;
 import io.playground.domain.Department_;
 import io.playground.model.DepartmentIn;
 import io.playground.model.DepartmentOut;
@@ -14,14 +15,13 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.data.web.SortDefault;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("api/departments")
 @Transactional
-@PreAuthorize("hasAnyRole('ROLE_app_user', 'ROLE_app_admin')")
+@CanEditCompanies
 public class DepartmentController {
 
     private final DepartmentService departmentService;

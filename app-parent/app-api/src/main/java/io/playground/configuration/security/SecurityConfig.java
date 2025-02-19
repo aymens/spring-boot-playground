@@ -13,11 +13,15 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtDecoders;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
+
+import java.util.ArrayList;
+import java.util.Collection;
 
 import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
 
@@ -28,6 +32,10 @@ import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
 public class SecurityConfig {
 
     private static final String OAUTH_SCHEME_NAME = "oauth2";
+    private static final String ROLES_CLAIM = "realm_roles";
+    private static final String SCOPE_CLAIM = "scope";
+    public static final String ROLE_PREFIX = "ROLE_";
+    public static final String SCOPE_PREFIX = "SCOPE_";
 
     @Bean
     public SecurityFilterChain securityFilterChain(
@@ -58,13 +66,25 @@ public class SecurityConfig {
 
     @Bean
     JwtAuthenticationConverter jwtAuthenticationConverter() {
+        // Convert the "realm_roles" claim (used for user roles)
+        JwtGrantedAuthoritiesConverter rolesGrantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
+        rolesGrantedAuthoritiesConverter.setAuthoritiesClaimName(ROLES_CLAIM);
+        rolesGrantedAuthoritiesConverter.setAuthorityPrefix(ROLE_PREFIX);
 
-        JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
-        jwtGrantedAuthoritiesConverter.setAuthoritiesClaimName("realm_roles");
-        jwtGrantedAuthoritiesConverter.setAuthorityPrefix("ROLE_");
+        // Convert the "scope" claim (used for client scopes)
+        JwtGrantedAuthoritiesConverter scopeGrantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
+        scopeGrantedAuthoritiesConverter.setAuthoritiesClaimName(SCOPE_CLAIM);
+        scopeGrantedAuthoritiesConverter.setAuthorityPrefix(SCOPE_PREFIX);
 
+        // Combine both role and scope authorities
         JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
-        jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(jwtGrantedAuthoritiesConverter);
+        jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(jwt -> {
+            // Combine roles and scopes
+            Collection<GrantedAuthority> authorities = new ArrayList<>();
+            authorities.addAll(rolesGrantedAuthoritiesConverter.convert(jwt));
+            authorities.addAll(scopeGrantedAuthoritiesConverter.convert(jwt));
+            return authorities;
+        });
 
         return jwtAuthenticationConverter;
     }

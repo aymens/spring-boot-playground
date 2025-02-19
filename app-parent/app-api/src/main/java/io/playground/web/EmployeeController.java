@@ -1,5 +1,6 @@
 package io.playground.web;
 
+import io.playground.configuration.security.permissions.CanEditCompanies;
 import io.playground.model.EmployeeIn;
 import io.playground.model.EmployeeOut;
 import io.playground.service.EmployeeService;
@@ -11,7 +12,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,7 +24,7 @@ import static java.time.ZoneOffset.UTC;
 @RestController
 @RequestMapping("api/employees")
 @Transactional
-@PreAuthorize("hasAnyRole('ROLE_app_user', 'ROLE_app_admin')")
+@CanEditCompanies
 public class EmployeeController {
 
     private final EmployeeService employeeService;
