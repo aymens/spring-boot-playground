@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.test.web.servlet.MvcResult;
 
 import java.time.Instant;
@@ -155,6 +156,56 @@ class CompanyControllerIT extends BaseControllerIntegrationTest_Pg16 {
                     .andExpect(status().isNotFound())
                     .andExpect(content().string(
                             containsString("Company(999) not found")));
+        }
+
+        @Test
+        @WithAnonymousUser
+        void getCompanies_WithoutAuth_Returns401() throws Exception {
+            mockMvc.perform(get("/api/companies"))
+                    .andExpect(status().isUnauthorized());
+        }
+
+        @Test
+        @WithMockJwtAuth
+            // no roles
+        void getCompanies_WithNoRoles_Returns403() throws Exception {
+            mockMvc.perform(get("/api/companies"))
+                    .andExpect(status().isForbidden());
+        }
+
+        @Test
+        @WithMockJwtAuth(roles = {"ROLE_app_user"})
+        void getCompanies_WithUserRole_Returns200() throws Exception {
+            mockMvc.perform(get("/api/companies"))
+                    .andExpect(status().isOk());
+        }
+
+        @Test
+        @WithMockJwtAuth(scopes = {"SCOPE_io.playground.company.read-write"})
+        void getCompanies_WithServiceScope_Returns200() throws Exception {
+            mockMvc.perform(get("/api/companies"))
+                    .andExpect(status().isOk());
+        }
+
+        @Test
+        @WithMockJwtAuth(scopes = {"wrong.scope"})
+        void getCompanies_WithWrongScope_Returns403() throws Exception {
+            mockMvc.perform(get("/api/companies"))
+                    .andExpect(status().isForbidden());
+        }
+
+        @Test
+        @WithMockJwtAuth(roles = {"wrong.role"})
+        void getCompanies_WithWrongRole_Returns403() throws Exception {
+            mockMvc.perform(get("/api/companies"))
+                    .andExpect(status().isForbidden());
+        }
+
+        @Test
+        @WithMockJwtAuth(roles = {"ROLE_app_user"}, scopes = {"SCOPE_io.playground.company.read-write"})
+        void getCompanies_WithBothRoleAndScope_Returns200() throws Exception {
+            mockMvc.perform(get("/api/companies"))
+                    .andExpect(status().isOk());
         }
     }
 

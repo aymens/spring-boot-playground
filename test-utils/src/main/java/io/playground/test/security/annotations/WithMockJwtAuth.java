@@ -9,4 +9,5 @@ import java.lang.annotation.RetentionPolicy;
 @WithSecurityContext(factory = WithMockJwtAuthSecurityContextFactory.class)
 public @interface WithMockJwtAuth {
     String[] roles() default {}; // Roles to be assigned to the mock user
+    String[] scopes() default {}; // Scopes to be assigned to the client by mock user
 }
