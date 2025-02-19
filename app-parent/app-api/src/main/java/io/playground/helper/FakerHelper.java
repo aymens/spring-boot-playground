@@ -1,6 +1,6 @@
 package io.playground.helper;
 
-import io.playground.configuration.ConditionalOnDataGeneratorEnabled;
+import io.playground.configuration.annotations.ConditionalOnDataGeneratorEnabled;
 import io.playground.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

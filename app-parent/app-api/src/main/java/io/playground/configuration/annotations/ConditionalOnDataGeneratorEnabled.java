@@ -1,4 +1,4 @@
-package io.playground.configuration;
+package io.playground.configuration.annotations;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 

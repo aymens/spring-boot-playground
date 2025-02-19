@@ -1,6 +1,6 @@
 package io.playground.web;
 
-import io.playground.configuration.ConditionalOnDataGeneratorEnabled;
+import io.playground.configuration.annotations.ConditionalOnDataGeneratorEnabled;
 import io.playground.domain.Company;
 import io.playground.domain.Department;
 import io.playground.exception.InvalidIdRangeException;

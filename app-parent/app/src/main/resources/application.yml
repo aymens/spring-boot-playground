@@ -63,8 +63,8 @@ spring:
 springdoc:
   show-actuator: ${SHOW_ACTUATOR:true}
   swagger-ui:
-    try-it-out-enabled: true
     path: ${SWAGGER_UI_PATH:/swagger-ui.html}
+    try-it-out-enabled: true
     oauth:
       client-id: ${SWAGGER_CLIENT_ID:playground-swagger-ui-client}
       scopes: ${SWAGGER_CLIENT_SCOPES:openid,profile}

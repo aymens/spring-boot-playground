@@ -2,15 +2,6 @@ server:
   port: ${SERVER_PORT:8088}
   address: ${SERVER_ADDRESS:0.0.0.0}
 
-springdoc:
-  show-actuator: ${SHOW_ACTUATOR:true}
-  swagger-ui:
-    path: ${SWAGGER_UI_PATH:/swagger-ui.html}
-    try-it-out-enabled: true
-    oauth:
-      client-id: ${SWAGGER_CLIENT_ID:swagger-ui}
-      scopes: ${SWAGGER_CLIENT_SCOPES:openid,profile}
-
 spring:
   application:
     name: ${SPRING_APPLICATION_NAME:spring-boot-playground}
@@ -40,6 +31,24 @@ spring:
 #    change-log: classpath:db/changelog/db.changelog-master.yaml
     change-log: ${SPRING_LIQUIBASE_CHANGE_LOG:classpath:db/changelog/db.changelog-master.xml}
     enabled: ${SPRING_LIQUIBASE_ENABLED:true}
+
+springdoc:
+  show-actuator: ${SHOW_ACTUATOR:true}
+  swagger-ui:
+    path: ${SWAGGER_UI_PATH:/swagger-ui.html}
+    try-it-out-enabled: true
+    oauth:
+      client-id: ${SWAGGER_CLIENT_ID:playground-swagger-ui-client}
+      scopes: ${SWAGGER_CLIENT_SCOPES:openid,profile}
+
+playground:
+  api:
+    rest:
+      data-generator:
+        enabled: ${PLAYGROUND_API_REST_DATA_GENERATOR_ENABLED:false}
+      sandbox:
+        enabled: ${PLAYGROUND_API_REST_SANDBOX_ENABLED:false}
+
 #management:
 #  endpoint:
 ##    metrics:
