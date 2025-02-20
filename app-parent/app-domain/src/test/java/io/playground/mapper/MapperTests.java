@@ -14,11 +14,14 @@ import java.time.Instant;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@SpringBootTest(classes = {
-        CompanyMapperImpl.class,
-        DepartmentMapperImpl.class,
-        EmployeeMapperImpl.class
-})
+@SpringBootTest(
+        classes = {
+                CompanyMapperImpl.class,
+                DepartmentMapperImpl.class,
+                EmployeeMapperImpl.class
+        },
+        webEnvironment = SpringBootTest.WebEnvironment.NONE
+)
 class MapperTests {
     @Autowired
     private CompanyMapper companyMapper;
@@ -120,7 +123,7 @@ class MapperTests {
         }
 
         @Test
-        void map_WithValidEmployee_ReturnsExpectedDomain () {
+        void map_WithValidEmployee_ReturnsExpectedDomain() {
             val in = EmployeeIn.builder()
                     .firstName("John")
                     .lastName("Doe")

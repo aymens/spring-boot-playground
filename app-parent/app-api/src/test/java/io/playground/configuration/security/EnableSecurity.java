@@ -1,6 +1,6 @@
 package io.playground.configuration.security;
 
-import io.playground.test.configuration.security.SecurityAutoConfig;
+import io.playground.test.configuration.security.SecurityMocksConfig;
 import org.springframework.context.annotation.Import;
 
 import java.lang.annotation.ElementType;
@@ -17,7 +17,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Import({
         SecurityConfig.class,
-        SecurityAutoConfig.class
+        SecurityMocksConfig.class
 })
 public @interface EnableSecurity {
 }

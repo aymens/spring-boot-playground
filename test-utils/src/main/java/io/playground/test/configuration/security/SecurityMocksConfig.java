@@ -3,8 +3,9 @@ package io.playground.test.configuration.security;
 import io.swagger.v3.oas.models.OpenAPI;
 import lombok.extern.slf4j.Slf4j;
 import org.springdoc.core.properties.SwaggerUiOAuthProperties;
-import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
@@ -13,9 +14,10 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import static org.mockito.Mockito.mock;
 
 @Profile("test")
-@AutoConfiguration
+@Configuration
+@ConditionalOnWebApplication
 @Slf4j
-public class SecurityAutoConfig {
+public class SecurityMocksConfig {
 
     @Bean
     @Primary

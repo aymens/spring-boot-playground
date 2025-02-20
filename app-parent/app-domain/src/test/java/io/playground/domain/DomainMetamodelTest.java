@@ -13,7 +13,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
     Thus, the need for the SpringBootTest.
  */
-@SpringBootTest
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
 class DomainMetamodelTest {
     @Test
     @DisplayName("verify_entityMetamodel_allFieldsGenerated")
