@@ -1,6 +1,102 @@
 #version: '3.8'
 name: "playground"
 services:
+
+  chartmuseum:
+    image: ghcr.io/helm/chartmuseum:v0.16.0
+    container_name: chartmuseum
+    restart: unless-stopped
+    environment:
+      - STORAGE=local
+      - STORAGE_LOCAL_ROOTDIR=/charts
+      - PORT=8080
+      - DEBUG=1
+      - LOG_JSON=true
+      - DISABLE_API=false
+      - ALLOW_OVERWRITE=true
+    volumes:
+      - chartmuseum_data:/charts
+    ports:
+      - "${CHARTMUSEUM_PORT}:8080"
+    healthcheck:
+      test: [ "CMD", "wget", "-q", "http://localhost:8080/health", "-O", "-" ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  prometheus-config:
+    image: alpine:latest
+    container_name: prometheus-config
+    environment:
+      - APP_HOST_TARGET=${APP_HOST}:${APP_PORT}
+#      - ADMIN_HOST_TARGET=sba:${ADMIN_PORT}
+##      - ADMIN_HOST_TARGET=${APP_HOST}:${ADMIN_PORT}
+    volumes:
+      - ./monitoring/prometheus:/etc/prometheus:ro
+      - prometheus-config:/prometheus-config
+    entrypoint: >
+      sh -c '
+      apk add --no-cache gettext &&
+      envsubst < /etc/prometheus/prometheus.yml.template > /prometheus-config/prometheus.yml &&
+      cat /prometheus-config/prometheus.yml'
+
+  prometheus:
+    image: prom/prometheus:v2.50.1
+    container_name: prometheus
+    restart: unless-stopped
+    depends_on:
+      prometheus-config:
+        condition: service_completed_successfully
+    volumes:
+      - prometheus-config:/etc/prometheus:ro
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention.time=${PROMETHEUS_RETENTION_TIME}'
+      - '--storage.tsdb.retention.size=${PROMETHEUS_RETENTION_SIZE}'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--web.enable-lifecycle'
+#    environment:
+#      - APP_HOST_TARGET=${APP_HOST}:${APP_PORT}
+###      - ADMIN_HOST_TARGET=sba:${ADMIN_PORT}
+##      - ADMIN_HOST_TARGET=${APP_HOST}:${ADMIN_PORT}
+    ports:
+      - "${PROMETHEUS_PORT}:9090"
+    healthcheck:
+      test: ["CMD", "wget", "-q", "http://localhost:9090/-/ready", "-O", "-"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
+  grafana:
+    image: grafana/grafana:10.4.0
+    container_name: grafana
+    restart: unless-stopped
+    environment:
+      - GF_SECURITY_ADMIN_USER=${GRAFANA_ADMIN_USER}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD}
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_UNIFIED_ALERTING_ENABLED=true
+      - GF_ALERTING_ENABLED=false  # Disable legacy alerting
+    volumes:
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning
+      - grafana_data:/var/lib/grafana
+    ports:
+      - "${GRAFANA_PORT}:3000"
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/api/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    depends_on:
+      prometheus:
+        condition: service_healthy
+
   keycloak:
     image: quay.io/keycloak/keycloak:23.0
     container_name: keycloak
@@ -16,17 +112,18 @@ services:
       KEYCLOAK_ADMIN: ${KC_ADMIN}
       KEYCLOAK_ADMIN_PASSWORD: ${KC_ADMIN_PASSWORD}
     ports:
-      - "8082:8080"
+      - "${KC_PORT}:8080"
     healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:8080/health/ready" ]
+      test: [ "CMD", "bash", "-c", 'exec 3<> /dev/tcp/localhost/8080 || exit 1' ]
       interval: 30s
       timeout: 10s
       retries: 3
+      start_period: 60s
     restart: unless-stopped
 
   rest-api:
     build:
-      context: ./app-parent/app
+      context: ./app-parent/app-bootstrap
       dockerfile: Dockerfile
     image: rest-api
     container_name: rest-api
@@ -35,17 +132,26 @@ services:
         condition: service_healthy
       sba:
         condition: service_healthy
+      keycloak:
+        condition: service_healthy
     ports:
-      - "8088:8088"
+      - "${APP_PORT}:8088"
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/${APP_DB}
       SPRING_DATASOURCE_USERNAME: ${APP_USER}
       SPRING_DATASOURCE_PASSWORD: ${APP_PASSWORD}
+      SPRING_BOOT_ADMIN_CLIENT_URL: http://sba:${ADMIN_PORT}/
+      SPRING_BOOT_ADMIN_CLIENT_INSTANCE_SERVICE_URL: http://${APP_HOST}:${APP_PORT}
+      OAUTH2_AUTHORIZATION_URI: http://keycloak:8080/realms/playground-realm/protocol/openid-connect/auth
+      OAUTH2_TOKEN_URI: http://keycloak:8080/realms/playground-realm/protocol/openid-connect/token
+      OAUTH2_JWT_ISSUER_URI: http://keycloak:8080/realms/playground-realm
+      OAUTH2_JWK_SET_URI: http://keycloak:8080/realms/playground-realm/protocol/openid-connect/certs
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:8088/actuator/health" ]
       interval: 30s
       timeout: 10s
       retries: 3
+      start_period: 40s
 #    restart: unless-stopped
 
   sba:
@@ -55,12 +161,13 @@ services:
     image: sba
     container_name: sba
     ports:
-      - "8081:8081"
+      - "${ADMIN_PORT}:8081"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8081/actuator/health"]
       interval: 30s
       timeout: 10s
       retries: 3
+      start_period: 40s
     restart: unless-stopped
 
   db:
@@ -84,16 +191,20 @@ services:
       - postgres_data:/var/lib/postgresql/data
       - ./scripts/init-db.sh:/docker-entrypoint-initdb.d/init-db.sh
     entrypoint: [ "sh", "-c", "docker-entrypoint.sh postgres & sleep 5; /docker-entrypoint-initdb.d/init-db.sh; wait" ]
-
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}" ]
       interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 30s
     restart: unless-stopped
 
 volumes:
   postgres_data:
+  prometheus-config:
+  prometheus_data:
+  grafana_data:
+  chartmuseum_data:
 #  init_scripts:
 #    driver: local
 #    driver_opts:
@@ -110,3 +221,11 @@ volumes:
 # docker compose down sba && docker compose up -d sba
 # docker compose down sba && docker rm -f sba && docker compose up -d --force-recreate sba
 # docker compose down sba && docker rm -f sba && docker compose up -d --build --force-recreate sba
+# dc exec prometheus-config sh
+# dc run --rm -it prometheus-config sh
+# dc down && dc up -d --force-recreate --scale rest-api=0
+# docker pull eclipse-temurin:22-jre-alpine
+# docker login
+# dc --env-file .env.local.win down && dc --env-file .env.local.win up -d --scale rest-api=0
+# alias dcl="dc --env-file .env --env-file .env.local.win"
+# dcl down && dcl up -d --scale rest-api=0

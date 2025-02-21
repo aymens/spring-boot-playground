@@ -63,7 +63,7 @@ public class GreetingController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    // Optional with Mono<ResponseEntity> example
+    /// Optional with Mono<ResponseEntity> example
     @GetMapping("v3/greeting")
     public Mono<ResponseEntity<Greeting>> greetingV3(
             @RequestParam(value = "name", defaultValue = "World") String name) {

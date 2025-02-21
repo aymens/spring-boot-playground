@@ -1,0 +1,207 @@
+# yaml-language-server: $schema=./grafana-alerts-schema.json
+# ./monitoring/grafana/provisioning/alerting/alert_rules.yml
+apiVersion: 1
+
+groups:
+  - name: SpringBootAlerts 0
+    folder: Alerts
+    interval: 60s
+    rules:
+      - uid: high_memory_usage
+        title: High JVM Memory Usage
+        condition: C
+        data:
+          - refId: A
+            datasourceUid: __expr__
+            model:
+              datasource:
+                type: prometheus
+                uid: "${datasource}"
+              editorMode: code
+              expr: sum(jvm_memory_used_bytes{job="${job}"}) / sum(jvm_memory_max_bytes{job="${job}"}) * 100
+              instant: true
+              range: false
+              refId: A
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              datasource:
+                type: prometheus
+                uid: "${datasource}"
+              editorMode: code
+              expr: 85
+              instant: false
+              range: false
+              refId: B
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              conditions:
+                - evaluator:
+                    params:
+                      - 0
+                    type: gt
+                  operator:
+                    type: and
+                  query:
+                    params:
+                      - A
+                  reducer:
+                    params: []
+                    type: last
+                  type: query
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: $A > $B
+              refId: C
+              type: math
+        noDataState: NoData
+        execErrState: Alerting
+        for: 5m
+        annotations:
+          summary: "JVM memory usage is high"
+          description: "JVM memory usage is {{ $values.A }}%, which exceeds the threshold of 85%"
+        labels:
+          severity: warning
+
+      - uid: high_response_time
+        title: High API Response Time
+        condition: C
+        data:
+          - refId: A
+            datasourceUid: __expr__
+            model:
+              datasource:
+                type: prometheus
+                uid: "${datasource}"
+              editorMode: code
+              expr: sum(rate(http_server_requests_seconds_sum{job="${job}", uri=~"/api/.*"}[5m])) by (uri) / sum(rate(http_server_requests_seconds_count{job="${job}", uri=~"/api/.*"}[5m])) by (uri) > 1
+              instant: true
+              range: false
+              refId: A
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              conditions:
+                - evaluator:
+                    params:
+                      - 0
+                    type: gt
+                  operator:
+                    type: and
+                  query:
+                    params:
+                      - A
+                  reducer:
+                    params: []
+                    type: last
+                  type: query
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: A
+              refId: C
+              type: reducing
+        noDataState: NoData
+        execErrState: Alerting
+        for: 3m
+        annotations:
+          summary: "API response time is high"
+          description: "One or more API endpoints have response times > 1 second"
+        labels:
+          severity: warning
+
+      - uid: error_rate_high
+        title: High Error Rate
+        condition: C
+        data:
+          - refId: A
+            datasourceUid: __expr__
+            model:
+              datasource:
+                type: prometheus
+                uid: "${datasource}"
+              editorMode: code
+              expr: sum(rate(http_server_requests_seconds_count{job="${job}", status=~"5.."}[5m])) / sum(rate(http_server_requests_seconds_count{job="${job}"}[5m])) * 100 > 5
+              instant: true
+              range: false
+              refId: A
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              conditions:
+                - evaluator:
+                    params:
+                      - 0
+                    type: gt
+                  operator:
+                    type: and
+                  query:
+                    params:
+                      - A
+                  reducer:
+                    params: []
+                    type: last
+                  type: query
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: A
+              refId: C
+              type: reducing
+        noDataState: NoData
+        execErrState: Alerting
+        for: 2m
+        annotations:
+          summary: "Error rate is high"
+          description: "The rate of 5xx errors exceeds 5% of total requests"
+        labels:
+          severity: critical
+
+      - uid: app_down
+        title: Application Down
+        condition: C
+        data:
+          - refId: A
+            datasourceUid: __expr__
+            model:
+              datasource:
+                type: prometheus
+                uid: "${datasource}"
+              editorMode: code
+              expr: up{job="${job}"} != 1
+              instant: true
+              range: false
+              refId: A
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              conditions:
+                - evaluator:
+                    params:
+                      - 0
+                    type: gt
+                  operator:
+                    type: and
+                  query:
+                    params:
+                      - A
+                  reducer:
+                    params: []
+                    type: last
+                  type: query
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: A
+              refId: C
+              type: reducing
+        noDataState: Alerting
+        execErrState: Alerting
+        for: 1m
+        annotations:
+          summary: "Application down"
+          description: "The Spring Boot application is not responding to Prometheus scrapes"
+        labels:
+          severity: critical

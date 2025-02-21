@@ -1,0 +1,228 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Grafana Unified Alerting Schema",
+  "description": "Schema for Grafana Unified Alerting configuration files",
+  "type": "object",
+  "required": ["apiVersion", "groups"],
+  "properties": {
+    "apiVersion": {
+      "type": "integer",
+      "enum": [1],
+      "description": "API version for the Grafana alerting configuration"
+    },
+    "groups": {
+      "type": "array",
+      "description": "List of alert rule groups",
+      "items": {
+        "type": "object",
+        "required": ["name", "rules"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Name of the alert group"
+          },
+          "folder": {
+            "type": "string",
+            "description": "Folder to store the alert rules in"
+          },
+          "interval": {
+            "type": "string",
+            "description": "Evaluation interval (e.g., '1m', '30s')",
+            "pattern": "^[0-9]+(ms|s|m|h)$"
+          },
+          "rules": {
+            "type": "array",
+            "description": "List of alert rules",
+            "items": {
+              "type": "object",
+              "required": ["uid", "title", "condition"],
+              "properties": {
+                "uid": {
+                  "type": "string",
+                  "description": "Unique identifier for the alert rule"
+                },
+                "title": {
+                  "type": "string",
+                  "description": "Title of the alert rule"
+                },
+                "condition": {
+                  "type": "string",
+                  "description": "Reference to the refId of the condition query"
+                },
+                "data": {
+                  "type": "array",
+                  "description": "Data queries and expressions for the alert rule",
+                  "items": {
+                    "type": "object",
+                    "required": ["refId"],
+                    "properties": {
+                      "refId": {
+                        "type": "string",
+                        "description": "Reference ID for the query or expression"
+                      },
+                      "datasourceUid": {
+                        "type": "string",
+                        "description": "UID of the datasource"
+                      },
+                      "model": {
+                        "type": "object",
+                        "description": "Query or expression model",
+                        "properties": {
+                          "datasource": {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string"
+                              },
+                              "uid": {
+                                "type": "string"
+                              }
+                            }
+                          },
+                          "expr": {
+                            "type": "string",
+                            "description": "Query expression"
+                          },
+                          "editorMode": {
+                            "type": "string",
+                            "enum": ["code", "builder"],
+                            "description": "Editor mode for the query"
+                          },
+                          "instant": {
+                            "type": "boolean",
+                            "description": "Whether to use instant queries"
+                          },
+                          "range": {
+                            "type": "boolean",
+                            "description": "Whether to use range queries"
+                          },
+                          "intervalMs": {
+                            "type": "integer",
+                            "description": "Query interval in milliseconds"
+                          },
+                          "legendFormat": {
+                            "type": "string",
+                            "description": "Format for the legend"
+                          },
+                          "hide": {
+                            "type": "boolean",
+                            "description": "Whether to hide the query"
+                          },
+                          "conditions": {
+                            "type": "array",
+                            "description": "Conditions for reducing expressions",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "evaluator": {
+                                  "type": "object",
+                                  "properties": {
+                                    "type": {
+                                      "type": "string",
+                                      "enum": ["gt", "lt", "within_range", "outside_range", "eq", "neq"]
+                                    },
+                                    "params": {
+                                      "type": "array",
+                                      "items": {
+                                        "type": ["number", "string", "null"]
+                                      }
+                                    }
+                                  }
+                                },
+                                "operator": {
+                                  "type": "object",
+                                  "properties": {
+                                    "type": {
+                                      "type": "string",
+                                      "enum": ["and", "or"]
+                                    }
+                                  }
+                                },
+                                "query": {
+                                  "type": "object",
+                                  "properties": {
+                                    "params": {
+                                      "type": "array",
+                                      "items": {
+                                        "type": "string"
+                                      }
+                                    }
+                                  }
+                                },
+                                "reducer": {
+                                  "type": "object",
+                                  "properties": {
+                                    "type": {
+                                      "type": "string",
+                                      "enum": ["avg", "min", "max", "sum", "count", "last", "median", "diff", "percent_diff", "count_non_null"]
+                                    },
+                                    "params": {
+                                      "type": "array",
+                                      "items": {
+                                        "type": ["number", "string", "null"]
+                                      }
+                                    }
+                                  }
+                                },
+                                "type": {
+                                  "type": "string",
+                                  "enum": ["query"]
+                                }
+                              }
+                            }
+                          },
+                          "expression": {
+                            "type": "string",
+                            "description": "Math expression for alert condition"
+                          },
+                          "type": {
+                            "type": "string",
+                            "enum": ["math", "reduce", "resample", "classic_conditions", "threshold"],
+                            "description": "Type of expression"
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "noDataState": {
+                  "type": "string",
+                  "enum": ["NoData", "Alerting", "OK", "Keep Last State"],
+                  "description": "Alert state for no data"
+                },
+                "execErrState": {
+                  "type": "string",
+                  "enum": ["Error", "Alerting", "OK", "Keep Last State"],
+                  "description": "Alert state for execution errors"
+                },
+                "for": {
+                  "type": "string",
+                  "description": "Duration the condition must be met before alerting",
+                  "pattern": "^[0-9]+(ms|s|m|h)$"
+                },
+                "isPaused": {
+                  "type": "boolean",
+                  "description": "Whether the alert rule is paused"
+                },
+                "annotations": {
+                  "type": "object",
+                  "description": "Annotations for the alert rule",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                },
+                "labels": {
+                  "type": "object",
+                  "description": "Labels for the alert rule",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,3 +1,6 @@
+# @claude can we update this whole dockerfile to intelligently multistage build this to be independent from existing /target prior build? with no mvn tests obviously? your thoughts?
+# notice that this is a multi module project, and the parent, or maybe even the root parent that needs to be build inside the build stage
+
 FROM eclipse-temurin:22-jre-alpine
 
 RUN addgroup -S -g 1001 appuser && \
@@ -7,7 +10,7 @@ RUN addgroup -S -g 1001 appuser && \
 WORKDIR /app
 
 #COPY target/app-*.jar app.jar
-COPY target/*.jar app.jar
+COPY target/app*.jar app.jar
 
 RUN chown appuser:appuser app.jar
 

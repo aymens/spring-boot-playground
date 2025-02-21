@@ -32,3 +32,4 @@ logs/
 # OS-specific
 .DS_Store
 Thumbs.db
+/srcs.txt

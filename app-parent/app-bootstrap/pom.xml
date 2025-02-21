@@ -10,7 +10,7 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>app</artifactId>
+    <artifactId>app-bootstrap</artifactId>
 
     <properties>
         <start-class>io.playground.PlaygroundApplication</start-class>
@@ -20,7 +20,7 @@
         <dependency>
             <groupId>io.playground</groupId>
             <artifactId>app-api</artifactId>
-            <version>${project.version}</version>
+            <version>${project.version}</version><!-- todo add in parent as dep management, then import here versionless-->
         </dependency>
         <dependency>
             <groupId>de.codecentric</groupId>

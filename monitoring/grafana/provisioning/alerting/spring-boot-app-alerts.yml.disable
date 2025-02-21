@@ -1,0 +1,111 @@
+# ./monitoring/grafana/provisioning/alerting/spring-boot-app-alerts.yml
+apiVersion: 1
+
+groups:
+  - name: SpringBootAlerts
+    folder: Alerts
+    interval: 60s
+    rules:
+      - uid: app_down
+        title: Application Down
+        for: 1m
+        annotations:
+          summary: "Application is down"
+          description: "The Spring Boot application instance is not responding"
+        labels:
+          severity: critical
+        data:
+          - refId: A
+            queryType: ""
+            relativeTimeRange:
+              from: 0
+              to: 0
+            datasourceUid: "Prometheus"
+            model:
+              editorMode: "code"
+              expr: "up{job=\"spring-boot-app\"} == 0"
+              instant: true
+              intervalMs: 1000
+              maxDataPoints: 43200
+              refId: "A"
+        condition: A
+        noDataState: Alerting
+        execErrState: Alerting
+
+      - uid: high_memory_usage
+        title: High JVM Memory Usage
+        for: 5m
+        annotations:
+          summary: "High JVM memory usage"
+          description: "Memory usage is above 85%"
+        labels:
+          severity: warning
+        data:
+          - refId: A
+            queryType: ""
+            relativeTimeRange:
+              from: 0
+              to: 0
+            datasourceUid: "Prometheus"
+            model:
+              editorMode: "code"
+              expr: "sum(jvm_memory_used_bytes{job=\"spring-boot-app\"}) / sum(jvm_memory_max_bytes{job=\"spring-boot-app\"}) * 100 > 85"
+              instant: true
+              intervalMs: 1000
+              maxDataPoints: 43200
+              refId: "A"
+        condition: A
+        noDataState: NoData
+        execErrState: Alerting
+
+      - uid: high_response_time
+        title: High API Response Time
+        for: 3m
+        annotations:
+          summary: "API response time is high"
+          description: "One or more API endpoints have response times > 1 second"
+        labels:
+          severity: warning
+        data:
+          - refId: A
+            queryType: ""
+            relativeTimeRange:
+              from: 0
+              to: 0
+            datasourceUid: "Prometheus"
+            model:
+              editorMode: "code"
+              expr: "sum(rate(http_server_requests_seconds_sum{job=\"spring-boot-app\", uri=~\"/api/.*\"}[5m])) by (uri) / sum(rate(http_server_requests_seconds_count{job=\"spring-boot-app\", uri=~\"/api/.*\"}[5m])) by (uri) > 1"
+              instant: true
+              intervalMs: 1000
+              maxDataPoints: 43200
+              refId: "A"
+        condition: A
+        noDataState: NoData
+        execErrState: Alerting
+
+      - uid: error_rate_high
+        title: High Error Rate
+        for: 2m
+        annotations:
+          summary: "Error rate is high"
+          description: "The rate of 5xx errors exceeds 5% of total requests"
+        labels:
+          severity: critical
+        data:
+          - refId: A
+            queryType: ""
+            relativeTimeRange:
+              from: 0
+              to: 0
+            datasourceUid: "Prometheus"
+            model:
+              editorMode: "code"
+              expr: "sum(rate(http_server_requests_seconds_count{job=\"spring-boot-app\", status=~\"5..\"}[5m])) / sum(rate(http_server_requests_seconds_count{job=\"spring-boot-app\"}[5m])) * 100 > 5"
+              instant: true
+              intervalMs: 1000
+              maxDataPoints: 43200
+              refId: "A"
+        condition: A
+        noDataState: NoData
+        execErrState: Alerting
