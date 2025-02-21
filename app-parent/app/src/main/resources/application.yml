@@ -78,6 +78,12 @@ playground:
         enabled: ${PLAYGROUND_API_REST_SANDBOX_ENABLED:false}
 
 management:
+  metrics:
+    tags:
+      application: ${spring.application.name}
+#    enable:
+#      all: true
+
   endpoint:
 #    metrics:
 #      enabled: true
