@@ -54,6 +54,7 @@ spring:
   jpa:
     show-sql: ${SPRING_JPA_SHOW_SQL:true}    # Helpful during development to see the SQL
     generate-ddl: ${SPRING_JPA_GENERATE_DDL:false} # We want Liquibase, not Hibernate, to manage our schema
+    open-in-view: false
 
   liquibase:
 #    change-log: classpath:db/changelog/db.changelog-master.yaml

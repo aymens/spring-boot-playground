@@ -1,4 +1,4 @@
-package io.playground.configuration.security.permissions;
+package io.playground.security.permissions;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 

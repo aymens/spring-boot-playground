@@ -3,6 +3,7 @@ package io.playground.configuration.security;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.security.*;
+import lombok.val;
 import org.springdoc.core.properties.SwaggerUiOAuthProperties;
 import org.springframework.boot.autoconfigure.security.oauth2.resource.OAuth2ResourceServerProperties;
 import org.springframework.boot.autoconfigure.security.oauth2.server.servlet.OAuth2AuthorizationServerProperties;
@@ -15,7 +16,8 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
-import org.springframework.security.oauth2.jwt.JwtDecoders;
+import org.springframework.security.oauth2.jwt.JwtValidators;
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
@@ -62,7 +64,26 @@ public class SecurityConfig {
 
     @Bean
     JwtDecoder jwtDecoder(OAuth2ResourceServerProperties oAuth2ResourceServerProperties) {
-        return JwtDecoders.fromIssuerLocation(oAuth2ResourceServerProperties.getJwt().getIssuerUri());
+//        when run the api app from docker compose, the issuer uri caused a problem that prevented the app from starting.
+//        the issuer uri needs to match the one we get inside tokens: accessible from browser in case of swagger doc use.
+//        and needs to be accessible from the container.
+//        which were contradictory, thus the below new impl suggested by @Claude.
+//        return JwtDecoders.fromIssuerLocation(oAuth2ResourceServerProperties.getJwt().getIssuerUri());
+
+        /// Where to fetch JWKs from
+        // (needed for the tokens' validation)
+        val jwkSetUri = oAuth2ResourceServerProperties.getJwt().getJwkSetUri();
+        /// What issuer to expect in tokens
+        // (needs to match the 'iss' claim in tokens, ~'no further use, the other authorization needs are fulfilled by the jwk-set-uri')
+        val issuerUri = oAuth2ResourceServerProperties.getJwt().getIssuerUri();
+
+        /// Use jwk-set-uri (container-accessible) instead of issuer-uri
+        val jwtDecoder = NimbusJwtDecoder.withJwkSetUri(jwkSetUri).build();
+
+        // Set the expected issuer (browser-accessible URL)
+        jwtDecoder.setJwtValidator(JwtValidators.createDefaultWithIssuer(issuerUri));
+
+        return jwtDecoder;
     }
 
     @Bean

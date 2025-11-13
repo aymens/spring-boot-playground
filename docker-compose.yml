@@ -17,7 +17,7 @@ services:
     volumes:
       - chartmuseum_data:/charts
     ports:
-      - "${CHARTMUSEUM_PORT}:8080"
+      - "${CHARTMUSEUM_PORT_EXT}:${CHARTMUSEUM_PORT_INT}"
     healthcheck:
       test: [ "CMD", "wget", "-q", "http://localhost:8080/health", "-O", "-" ]
       interval: 10s
@@ -29,7 +29,7 @@ services:
     image: alpine:latest
     container_name: prometheus-config
     environment:
-      - APP_HOST_TARGET=${APP_HOST}:${APP_PORT}
+      - APP_HOST_TARGET=${APP_HOST_INT}:${APP_PORT_INT}
 #      - ADMIN_HOST_TARGET=sba:${ADMIN_PORT}
 ##      - ADMIN_HOST_TARGET=${APP_HOST}:${ADMIN_PORT}
     volumes:
@@ -59,14 +59,10 @@ services:
       - '--web.console.libraries=/etc/prometheus/console_libraries'
       - '--web.console.templates=/etc/prometheus/consoles'
       - '--web.enable-lifecycle'
-#    environment:
-#      - APP_HOST_TARGET=${APP_HOST}:${APP_PORT}
-###      - ADMIN_HOST_TARGET=sba:${ADMIN_PORT}
-##      - ADMIN_HOST_TARGET=${APP_HOST}:${ADMIN_PORT}
     ports:
-      - "${PROMETHEUS_PORT}:9090"
+      - "${PROMETHEUS_PORT_EXT}:${PROMETHEUS_PORT_INT}"
     healthcheck:
-      test: ["CMD", "wget", "-q", "http://localhost:9090/-/ready", "-O", "-"]
+      test: ["CMD", "wget", "-q", "http://localhost:${PROMETHEUS_PORT_INT}/-/ready", "-O", "-"]
       interval: 10s
       timeout: 5s
       retries: 3
@@ -86,9 +82,9 @@ services:
       - ./monitoring/grafana/provisioning:/etc/grafana/provisioning
       - grafana_data:/var/lib/grafana
     ports:
-      - "${GRAFANA_PORT}:3000"
+      - "${GRAFANA_PORT_EXT}:${GRAFANA_PORT_INT}"
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/api/health"]
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:${GRAFANA_PORT_INT}/api/health"]
       interval: 10s
       timeout: 5s
       retries: 3
@@ -112,9 +108,9 @@ services:
       KEYCLOAK_ADMIN: ${KC_ADMIN}
       KEYCLOAK_ADMIN_PASSWORD: ${KC_ADMIN_PASSWORD}
     ports:
-      - "${KC_PORT}:8080"
+      - "${KC_PORT_EXT}:${KC_PORT_INT}"
     healthcheck:
-      test: [ "CMD", "bash", "-c", 'exec 3<> /dev/tcp/localhost/8080 || exit 1' ]
+      test: [ "CMD", "bash", "-c", 'exec 3<> /dev/tcp/localhost/${KC_PORT_INT} || exit 1' ]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -135,16 +131,19 @@ services:
       keycloak:
         condition: service_healthy
     ports:
-      - "${APP_PORT}:8088"
+      - "${APP_PORT_EXT}:${APP_PORT_INT}"
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/${APP_DB}
       SPRING_DATASOURCE_USERNAME: ${APP_USER}
       SPRING_DATASOURCE_PASSWORD: ${APP_PASSWORD}
-      SPRING_BOOT_ADMIN_CLIENT_URL: http://sba:${ADMIN_PORT}/
-      SPRING_BOOT_ADMIN_CLIENT_INSTANCE_SERVICE_URL: http://${APP_HOST}:${APP_PORT}
-      OAUTH2_AUTHORIZATION_URI: http://keycloak:8080/realms/playground-realm/protocol/openid-connect/auth
-      OAUTH2_TOKEN_URI: http://keycloak:8080/realms/playground-realm/protocol/openid-connect/token
-      OAUTH2_JWT_ISSUER_URI: http://keycloak:8080/realms/playground-realm
+      SPRING_BOOT_ADMIN_CLIENT_URL: http://sba:${ADMIN_PORT_INT}/
+      SPRING_BOOT_ADMIN_CLIENT_INSTANCE_SERVICE_URL: http://${APP_HOST_INT}:${APP_PORT_INT}
+      # Browser-accessible URLs (for Swagger UI)
+#      OAUTH2_AUTHORIZATION_URI: http://keycloak:8080/realms/playground-realm/protocol/openid-connect/auth
+#      OAUTH2_TOKEN_URI: http://keycloak:8080/realms/playground-realm/protocol/openid-connect/token
+      # Issuer that matches the JWT token (browser URL)
+#      OAUTH2_JWT_ISSUER_URI: http://keycloak:8080/realms/playground-realm
+      # Container-accessible URL (for JWK set retrieval)
       OAUTH2_JWK_SET_URI: http://keycloak:8080/realms/playground-realm/protocol/openid-connect/certs
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:8088/actuator/health" ]
@@ -161,9 +160,9 @@ services:
     image: sba
     container_name: sba
     ports:
-      - "${ADMIN_PORT}:8081"
+      - "${ADMIN_PORT_EXT}:${ADMIN_PORT_INT}"
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8081/actuator/health"]
+      test: ["CMD", "curl", "-f", "http://localhost:${ADMIN_PORT_INT}/actuator/health"]
       interval: 30s
       timeout: 10s
       retries: 3

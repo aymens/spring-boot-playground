@@ -1,6 +1,6 @@
 package io.playground.web;
 
-import io.playground.configuration.security.permissions.CanEditCompanies;
+import io.playground.security.permissions.CanEditCompanies;
 import io.playground.model.EmployeeIn;
 import io.playground.model.EmployeeOut;
 import io.playground.service.EmployeeService;

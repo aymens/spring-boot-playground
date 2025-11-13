@@ -1,6 +1,6 @@
 package io.playground.web;
 
-import io.playground.configuration.security.permissions.CanEditCompanies;
+import io.playground.security.permissions.CanEditCompanies;
 import io.playground.domain.Department_;
 import io.playground.model.DepartmentIn;
 import io.playground.model.DepartmentOut;

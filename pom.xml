@@ -249,10 +249,10 @@
                     <artifactId>maven-surefire-plugin</artifactId>
                     <!--                    <version>${maven-surefire-plugin.version}</version>-->
                     <configuration>
-                        <argLine>
-                            -javaagent:"${settings.localRepository}/org/mockito/mockito-core/5.14.2/mockito-core-5.14.2.jar"
-                            -XX:+EnableDynamicAgentLoading -Xshare:off
-                        </argLine>
+<!--                        <argLine>-->
+<!--                            -javaagent:"${settings.localRepository}/org/mockito/mockito-core/${mockito.version}/mockito-core-${mockito.version}.jar"-->
+<!--                            -XX:+EnableDynamicAgentLoading -Xshare:off-->
+<!--                        </argLine>-->
                         <environmentVariables>
                             <TESTCONTAINERS_REUSE_ENABLE>true</TESTCONTAINERS_REUSE_ENABLE>
                         </environmentVariables>
