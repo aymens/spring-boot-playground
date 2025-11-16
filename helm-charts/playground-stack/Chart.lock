@@ -1,0 +1,12 @@
+dependencies:
+- name: rest-api
+  repository: file://../rest-api
+  version: 1.0.0
+- name: sba
+  repository: file://../sba
+  version: 1.0.0
+- name: chartmuseum
+  repository: https://chartmuseum.github.io/charts
+  version: 3.9.0
+digest: sha256:9458a7a97920d16e6e2696fd126cf7a8ac985b12dacb5652f0ee9da2ceda9123
+generated: "2025-11-16T21:10:30.853418804+01:00"

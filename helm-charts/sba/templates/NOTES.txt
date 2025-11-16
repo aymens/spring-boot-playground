@@ -1,0 +1,6 @@
+Spring Boot Admin has been deployed!
+
+To access it:
+  kubectl port-forward svc/{{ include "sba.fullname" . }} 8081:8081
+
+Then visit: http://localhost:8081

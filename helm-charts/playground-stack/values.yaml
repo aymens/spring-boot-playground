@@ -1,0 +1,29 @@
+replicaCount: 1
+
+image:
+  repository: rest-api
+  tag: latest
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 8088
+
+# Environment variables (will move to ConfigMap later)
+env:
+  SPRING_DATASOURCE_URL: "jdbc:postgresql://host.docker.internal:5432/sandbox-rest-app"
+  SPRING_DATASOURCE_USERNAME: "sandbox-rest-app-user"
+  SPRING_DATASOURCE_PASSWORD: "sandbox-rest-app-user-pwd"
+  # Fixed: Use full K8s service name
+  SPRING_BOOT_ADMIN_CLIENT_URL: "http://playground-sba:8081/"
+  SPRING_BOOT_ADMIN_CLIENT_INSTANCE_SERVICE_URL: "http://playground-rest-api:8088"
+  SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: "http://host.docker.internal:8082/realms/playground-realm"
+  SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: "http://host.docker.internal:8082/realms/playground-realm/protocol/openid-connect/certs"
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 200m
+    memory: 256Mi

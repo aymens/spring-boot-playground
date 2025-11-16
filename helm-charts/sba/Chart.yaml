@@ -1,0 +1,6 @@
+apiVersion: v2
+name: sba
+description: Spring Boot Admin Server
+type: application
+version: 1.0.0
+appVersion: "3.4.1"

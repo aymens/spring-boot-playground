@@ -33,3 +33,6 @@ logs/
 .DS_Store
 Thumbs.db
 /srcs.txt
+
+# Helm Charts
+**/charts/*.tgz

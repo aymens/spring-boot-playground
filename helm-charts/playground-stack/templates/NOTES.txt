@@ -1,0 +1,14 @@
+🎉 Playground Stack Deployed!
+
+Your applications:
+{{- if index .Values "rest-api" "enabled" }}
+  - REST API: kubectl port-forward svc/{{ .Release.Name }}-rest-api 8088:8088
+    Access: http://localhost:8088/swagger-ui.html
+{{- end }}
+
+{{- if .Values.sba.enabled }}
+  - Spring Boot Admin: kubectl port-forward svc/{{ .Release.Name }}-sba 8081:8081
+    Access: http://localhost:8081
+{{- end }}
+
+Use 'helm status {{ .Release.Name }}' to check deployment status.

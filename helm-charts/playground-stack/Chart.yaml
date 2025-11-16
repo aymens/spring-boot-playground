@@ -1,0 +1,24 @@
+apiVersion: v2
+name: playground-stack
+description: Complete Spring Boot Playground application stack
+type: application
+version: 0.1.0
+
+dependencies:
+  # Your applications (local charts)
+  - name: rest-api
+#    alias: rest-api
+    version: 1.0.0
+    repository: "file://../rest-api"
+    condition: rest-api.enabled
+  
+  - name: sba
+    version: 1.0.0
+    repository: "file://../sba"
+    condition: sba.enabled
+  
+  # External dependencies (will add in Phase 2+)
+  - name: chartmuseum
+    version: 3.9.0
+    repository: https://chartmuseum.github.io/charts
+    condition: chartmuseum.enabled

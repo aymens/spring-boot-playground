@@ -1,0 +1,8 @@
+REST API has been deployed!
+
+To access it:
+  kubectl port-forward svc/{{ include "rest-api.fullname" . }} 8088:8088
+
+Then visit:
+  - Swagger UI: http://localhost:8088/swagger-ui.html
+  - Actuator: http://localhost:8088/actuator/health
